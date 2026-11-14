@@ -1,0 +1,19 @@
+# Dependencies (cài cục bộ theo dự án)
+**/node_modules/
+
+# Dữ liệu lưu nhân vật / thế giới / cấu hình runtime (server sẽ tự sinh mặc định khi chạy)
+server/data/*.json
+
+# Logs, backups, OS & temp files
+*.log
+*.bak
+*.tmp
+.DS_Store
+Thumbs.db
+.env
+
+# Reverse-engineering trace/tool scratch logs
+build-activity.log
+feed.json
+transcript.json
+usage.json

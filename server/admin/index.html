@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quản Trị Chùa · An Tự Duyên</title>
+  <link rel="stylesheet" href="/admin/admin.css" />
+</head>
+<body>
+  <div id="pinModal" class="modal hidden">
+    <div class="modal-card">
+      <h2>🔐 Nhập mã PIN quản trị</h2>
+      <p class="muted">Máy chủ đang bật bảo vệ trang quản trị. Vui lòng nhập mã PIN để tiếp tục.</p>
+      <input id="pinInput" type="password" placeholder="Nhập mã PIN..." autocomplete="off" />
+      <div id="pinError" class="error-text hidden"></div>
+      <div class="row end" style="margin-top:12px;">
+        <button id="pinSubmitBtn" class="btn primary">Đăng nhập</button>
+      </div>
+    </div>
+  </div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-badge">☸</div>
+      <div>
+        <h1>An Tự Duyên · Quản Trị Chùa</h1>
+        <div class="subline" id="serverMeta">Đang tải trạng thái máy chủ...</div>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <label class="toggle-chip" title="Tự động cập nhật mỗi 5 giây">
+        <input type="checkbox" id="autoRefreshChk" checked />
+        <span>Tự làm mới (5s)</span>
+      </label>
+      <button id="refreshBtn" class="btn">↻ Làm mới</button>
+      <a href="/?phong=chua-1" target="_blank" class="btn gold">⛩ Mở Game</a>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="overview">🏮 Tổng quan &amp; Sự kiện</button>
+    <button class="tab" data-tab="quests">📜 Nhiệm vụ &amp; Công đức</button>
+    <button class="tab" data-tab="players">🧘 Người chơi &amp; Danh hiệu</button>
+    <button class="tab" data-tab="world">🏯 Sân chùa &amp; Bảng vàng</button>
+  </nav>
+
+  <main class="container">
+    <!-- TAB 1: OVERVIEW -->
+    <section id="tab-overview" class="tab-panel active">
+      <div class="stats-grid" id="overviewStats"></div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-head">
+            <h2>🐂 Chia giờ Linh Vật (Sáng / Chiều)</h2>
+            <label class="switch">
+              <input type="checkbox" id="lvCooldownToggle" />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <p class="muted" id="lvCooldownHint">
+            Khi bật, mỗi linh vật chỉ tiến 1 bước trong khung giờ Sáng hoặc Chiều (giống chùa thật).
+          </p>
+          <div class="schedule-list" id="lvScheduleList"></div>
+          <div class="row gap" style="justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);">
+            <div>
+              <strong>🦢 Cưỡi hạc bay tự do mọi lúc</strong>
+              <div class="muted" style="margin:2px 0 0;">Bật để mọi người đều có thể gọi hạc trắng bay tự do 6 hướng (lên/xuống/trái/phải/tới/lui) trong chùa bất kể giờ hay bậc.</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="freeCraneToggle" />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="row gap" style="margin-top:12px;">
+            <button id="saveLvCooldownBtn" class="btn primary">Lưu chế độ Linh Vật</button>
+            <button id="resetAllLvBtn" class="btn warn">Mở lại lượt cho TẤT CẢ</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <h2>📢 Thông báo &amp; Bảng tin Ghim</h2>
+          </div>
+          <div class="form-group">
+            <label>Phòng áp dụng</label>
+            <select id="annRoomSelect">
+              <option value="all">Tất cả phòng chùa</option>
+              <option value="chua-1">chua-1</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Gửi thông báo nổi toàn chùa</label>
+            <div class="row gap">
+              <input id="annTextInput" type="text" placeholder="Ví dụ: Sắp đến giờ tụng kinh buổi tối..." />
+              <button id="sendAnnBtn" class="btn primary">Gửi</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Bảng tin ghim đầu màn hình (để trống để gỡ)</label>
+            <div class="row gap">
+              <input id="pinnedTextInput" type="text" placeholder="Thông điệp ghim cố định..." />
+              <button id="savePinnedBtn" class="btn">Cập nhật ghim</button>
+            </div>
+          </div>
+          <hr class="sep" />
+          <div class="form-group">
+            <label>Mã PIN bảo vệ trang /admin (để trống = không cần PIN)</label>
+            <div class="row gap">
+              <input id="adminPinInput" type="password" placeholder="Nhập PIN mới hoặc để trống..." />
+              <button id="savePinBtn" class="btn">Lưu PIN</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top:16px;">
+        <div class="card">
+          <div class="card-head">
+            <h2>🎉 Sự kiện Lễ hội (Lễ chùa)</h2>
+            <label class="switch">
+              <input type="checkbox" id="festEnabledToggle" />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="preset-bar" id="festPresetBar"></div>
+          <div class="grid-2 compact">
+            <div class="form-group">
+              <label>Mã lễ (`id`)</label>
+              <input id="festIdInput" type="text" placeholder="ram / mung1 / phatdan / vulan / tet" />
+            </div>
+            <div class="form-group">
+              <label>Thưởng công đức khi trọn lễ</label>
+              <input id="festRewardInput" type="number" min="0" />
+            </div>
+            <div class="form-group">
+              <label>Tên kỷ vật (`keep`)</label>
+              <input id="festKeepInput" type="text" />
+            </div>
+            <div class="form-group">
+              <label>Mô tả quà phụ (`prize`)</label>
+              <input id="festPrizeInput" type="text" />
+            </div>
+            <div class="form-group">
+              <label>Ngày Âm lịch (`lunar.day`)</label>
+              <input id="festLunarDayInput" type="number" min="1" max="30" />
+            </div>
+            <div class="form-group">
+              <label>Tháng Âm lịch (`lunar.month`)</label>
+              <input id="festLunarMonthInput" type="number" min="1" max="12" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Tiêu đề biểu ngữ (`banner`)</label>
+            <input id="festBannerInput" type="text" />
+          </div>
+          <div class="form-group">
+            <label>Các bước hoàn thành lễ</label>
+            <div id="festStepsContainer" class="steps-editor"></div>
+            <button id="addFestStepBtn" class="btn small" style="margin-top:6px;">+ Thêm bước lễ</button>
+          </div>
+          <div class="row gap" style="margin-top:12px;">
+            <button id="saveFestBtn" class="btn primary">Lưu &amp; Áp dụng Lễ hội</button>
+            <button id="saveResetFestBtn" class="btn warn">Lưu &amp; Reset tiến độ lễ của người chơi</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <h2>❓ Đố vui Phật pháp trực tiếp</h2>
+            <span id="quizStatusBadge" class="badge">Đang tắt</span>
+          </div>
+          <div class="grid-3 compact">
+            <div class="form-group">
+              <label>Số câu hỏi</label>
+              <input id="quizCountInput" type="number" min="1" max="20" value="5" />
+            </div>
+            <div class="form-group">
+              <label>Giây trả lời/câu</label>
+              <input id="quizAskSecInput" type="number" min="5" max="60" value="15" />
+            </div>
+            <div class="form-group">
+              <label>Giây xem đáp án</label>
+              <input id="quizShowSecInput" type="number" min="3" max="30" value="5" />
+            </div>
+          </div>
+          <div class="row gap">
+            <button id="startQuizBtn" class="btn primary">▶ Bắt đầu Đố vui</button>
+            <button id="nextQuizBtn" class="btn">⏭ Chuyển bước tiếp</button>
+            <button id="stopQuizBtn" class="btn danger">⏹ Dừng</button>
+          </div>
+          <div id="quizLiveBoard" class="sub-box" style="margin-top:12px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: QUESTS & REWARDS -->
+    <section id="tab-quests" class="tab-panel">
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-head">
+          <h2>🪙 Điểm công đức từng hành động</h2>
+          <div class="row gap">
+            <button id="resetDefaultConfigBtn" class="btn warn">↺ Khôi phục mặc định toàn bộ</button>
+            <button id="saveRewardsBtn" class="btn primary">Lưu điểm công đức</button>
+          </div>
+        </div>
+        <div class="rewards-grid" id="rewardsGrid"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>📜 Thiết lập Nhiệm vụ</h2>
+          <div class="row gap">
+            <select id="questSyncMode">
+              <option value="sync">Đồng bộ giữ nguyên tiến độ hiện tại</option>
+              <option value="daily">Đồng bộ + Reset nhiệm vụ Hôm nay</option>
+              <option value="weekly">Đồng bộ + Reset nhiệm vụ Tuần này</option>
+              <option value="newbie">Đồng bộ + Reset nhiệm vụ Người mới</option>
+            </select>
+            <button id="saveQuestsBtn" class="btn primary">Lưu &amp; Đồng bộ ngay</button>
+          </div>
+        </div>
+
+        <div class="subtabs">
+          <button class="subtab active" data-qpool="daily">Hôm nay (6)</button>
+          <button class="subtab" data-qpool="weekly">Tuần này (9)</button>
+          <button class="subtab" data-qpool="newbie">Người mới (3)</button>
+        </div>
+
+        <div id="questsEditorList" class="quest-editor"></div>
+        <div class="row" style="margin-top:10px;">
+          <button id="addQuestRowBtn" class="btn small">+ Thêm nhiệm vụ vào nhóm này</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: PLAYERS & TITLES -->
+    <section id="tab-players" class="tab-panel">
+      <div class="players-layout">
+        <div class="card players-list-card">
+          <div class="row gap" style="margin-bottom:10px;">
+            <input id="playerSearchInput" type="text" placeholder="Tìm tên, @tài khoản hoặc cid..." />
+            <select id="playerFilterSelect" style="max-width:130px;">
+              <option value="all">Tất cả</option>
+              <option value="online">Đang Online</option>
+              <option value="banned">Đã khóa</option>
+            </select>
+          </div>
+          <div id="playersList" class="players-list"></div>
+        </div>
+
+        <div class="card player-detail-card" id="playerDetailPanel">
+          <div class="empty-state">Chọn một nhân vật bên trái để xem và chỉnh sửa chi tiết.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: WORLD & DONORS -->
+    <section id="tab-world" class="tab-panel">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-head">
+            <h2>🕯 Bộ đếm Sân chùa &amp; Đỉnh hương</h2>
+            <select id="worldRoomSelect" style="max-width:160px;"></select>
+          </div>
+          <div class="grid-3 compact">
+            <div class="form-group">
+              <label>Hương Chính điện</label>
+              <input id="worldIncenseInput" type="number" min="0" />
+            </div>
+            <div class="form-group">
+              <label>Hương Đỉnh sân</label>
+              <input id="worldYardIncenseInput" type="number" min="0" />
+            </div>
+            <div class="form-group">
+              <label>Số ngọn đèn dầu</label>
+              <input id="worldLampsInput" type="number" min="0" />
+            </div>
+          </div>
+          <button id="saveWorldCountersBtn" class="btn primary">Cập nhật số hương &amp; đèn</button>
+
+          <hr class="sep" />
+          <div class="card-head">
+            <h3>🏆 Bảng Vàng Công Đức (Bia đá 3D)</h3>
+          </div>
+          <div class="row gap" style="margin-bottom:10px;">
+            <input id="newDonorInput" type="text" placeholder="Tên thí chủ hoặc dòng ghi danh..." />
+            <button id="addDonorBtn" class="btn gold">+ Ghi Bảng Vàng</button>
+          </div>
+          <div id="donorsList" class="item-list"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <h2>🙏 Lời nguyện &amp; Hoa đăng gần đây</h2>
+          </div>
+          <h3>Lời nguyện (Vows)</h3>
+          <div id="vowsList" class="item-list" style="margin-bottom:14px;"></div>
+          <h3>Hoa đăng (Lanterns)</h3>
+          <div id="lanternsList" class="item-list"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="/admin/admin.js"></script>
+</body>
+</html>

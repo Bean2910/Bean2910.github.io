@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#1d1610" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" type="image/png" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="An Tự Duyên" />
+    <meta property="og:title" content="An Tự Duyên · Chùa online" />
+    <meta property="og:description" content="Lên chùa cầu an, gặp người có duyên. Vào ngay trên điện thoại, không cần đăng nhập." />
+    <meta property="og:image" content="/icons/icon-512.png" />
+    <meta property="og:locale" content="vi_VN" />
+    <meta name="description" content="An Tự Duyên — lên chùa cầu an, gặp người có duyên. Ngôi chùa 3D trên trình duyệt, vào ngay không cần đăng nhập." />
+    <title>An Tự Duyên · Chùa online</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Lora:wght@500;600&display=swap" rel="stylesheet" />
+    <script type="module" crossorigin src="/assets/main-CPNz0KLo.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
+    <link rel="stylesheet" crossorigin href="/assets/main-DWI8sA1o.css">
+  </head>
+  <body>
+    <canvas id="scene"></canvas>
+    <div id="hud"></div>
+    <div id="loading">
+      <div class="loading-mark">An Tự Duyên</div>
+      <div class="loading-text">Đang mở cổng chùa…</div>
+      <div class="loading-bar"><span></span></div>
+      <div class="loading-quote"></div>
+    </div>
+    <script>
+      // a quiet line to read while the temple opens (our own words)
+      var q = [
+        'Đi chậm một chút, thở sâu một chút.',
+        'Lòng lặng rồi, ở đâu cũng là chùa.',
+        'Gieo một hạt lành, đợi một mùa an.',
+        'Buông bớt một điều, nhẹ thêm một bước.',
+        'Nụ cười hiền là nén hương thơm nhất.',
+        'Lên chùa hôm nay, mang bình an về nhà.',
+        'Mỗi tiếng chuông là một lần trở về.',
+      ];
+      document.querySelector('.loading-quote').textContent = '“' + q[Math.floor(Math.random() * q.length)] + '”';
+    </script>
+  </body>
+</html>

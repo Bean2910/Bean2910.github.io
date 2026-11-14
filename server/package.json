@@ -1,0 +1,14 @@
+{
+  "name": "didenchua-server",
+  "version": "1.0.0",
+  "description": "High performance, ultra-lightweight WebSocket & API server for Di Den Chua 3D Game",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "ws": "^8.19.0"
+  }
+}

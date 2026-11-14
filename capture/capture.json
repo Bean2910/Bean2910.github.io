@@ -1,0 +1,2091 @@
+{
+  "a11y": {
+    "images_without_alt": 0,
+    "landmarks": {
+      "navigation": 1
+    },
+    "lang": "vi",
+    "unnamed_controls": 0,
+    "unnamed_examples": []
+  },
+  "assets": {
+    "background_images": [],
+    "fonts": [
+      "https://fonts.googleapis.com/css2"
+    ],
+    "images": [],
+    "inline_scripts": 1,
+    "requests": [
+      {
+        "bytes": 1941,
+        "type": "link",
+        "url": "https://fonts.googleapis.com/css2"
+      },
+      {
+        "bytes": 704,
+        "type": "other",
+        "url": "https://didenchua.online/assets/modulepreload-polyfill-B5Qt9EMX.js"
+      },
+      {
+        "bytes": 409627,
+        "type": "script",
+        "url": "https://didenchua.online/assets/main-CPNz0KLo.js"
+      },
+      {
+        "bytes": 20255,
+        "type": "link",
+        "url": "https://didenchua.online/assets/main-DWI8sA1o.css"
+      },
+      {
+        "bytes": 0,
+        "type": "script",
+        "url": "https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092"
+      },
+      {
+        "bytes": 732,
+        "type": "link",
+        "url": "https://didenchua.online/manifest.webmanifest"
+      },
+      {
+        "bytes": 176584,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/buddha.glb"
+      },
+      {
+        "bytes": 80000,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/guardian.glb"
+      },
+      {
+        "bytes": 77596,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/maitreya.glb"
+      },
+      {
+        "bytes": 50092,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/monk.glb"
+      },
+      {
+        "bytes": 36816,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/seated.glb"
+      },
+      {
+        "bytes": 113612,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/banyan.glb"
+      },
+      {
+        "bytes": 85992,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/disciple.glb"
+      },
+      {
+        "bytes": 300,
+        "type": "xmlhttprequest",
+        "url": "https://didenchua.online/cdn-cgi/rum"
+      },
+      {
+        "bytes": 14017,
+        "type": "other",
+        "url": "https://didenchua.online/icons/icon-192.png"
+      },
+      {
+        "bytes": 300,
+        "type": "other",
+        "url": "https://didenchua.online/icons/icon-192.png"
+      },
+      {
+        "bytes": 12696,
+        "type": "fetch",
+        "url": "https://didenchua.online/draco/draco_wasm_wrapper.js"
+      },
+      {
+        "bytes": 61237,
+        "type": "fetch",
+        "url": "https://didenchua.online/draco/draco_decoder.wasm"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/guanyin.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/arhat_tinh.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/arhat_thap.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/arhat_truong.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/arhat_hy.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/arhat_long.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/arhat_bat.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/hophap_thien.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/hophap_ac.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/dilac.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/rong_bac.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/nghe_duc.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/nghe_cai.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/thichca.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/hoaquang.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/anan.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/cadiep.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/ducong.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/thanhhien.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/trau_body.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/trau_head.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/trau_legu.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/trau_legl.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/trau_tail.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/trau_harness.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/trau_saddle.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/trau_cloth.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/rua_than.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/rua_dau.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/rua_chantruoc.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/rua_chansau.glb"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/models/lohoa.glb"
+      },
+      {
+        "bytes": 338,
+        "type": "fetch",
+        "url": "https://didenchua.online/api/pass"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/draco/draco_wasm_wrapper.js"
+      },
+      {
+        "bytes": 0,
+        "type": "fetch",
+        "url": "https://didenchua.online/draco/draco_decoder.wasm"
+      },
+      {
+        "bytes": 0,
+        "type": "script",
+        "url": "https://challenges.cloudflare.com/turnstile/v0/api.js"
+      },
+      {
+        "bytes": 0,
+        "type": "iframe",
+        "url": "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/b/turnstile/f/av0/rch/sgqfu/0x4AAAAAAF_OYPMWlaKHcjTU/auto/fbE/new/flexible"
+      }
+    ],
+    "scripts": [
+      "https://didenchua.online/assets/main-CPNz0KLo.js",
+      "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit",
+      "https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092"
+    ],
+    "stylesheets": [
+      "https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Lora:wght@500;600&display=swap",
+      "https://didenchua.online/assets/main-DWI8sA1o.css"
+    ]
+  },
+  "breakpoints": [
+    {
+      "count": 1,
+      "px": 420,
+      "query": "max-width 420px"
+    },
+    {
+      "count": 2,
+      "px": 480,
+      "query": "max-width 480px"
+    },
+    {
+      "count": 3,
+      "px": 520,
+      "query": "max-width 520px"
+    },
+    {
+      "count": 1,
+      "px": 760,
+      "query": "min-width 760px"
+    }
+  ],
+  "design": {
+    "backgrounds": [
+      {
+        "count": 28,
+        "value": "#221a12ad"
+      },
+      {
+        "count": 4,
+        "value": "#221a1275"
+      },
+      {
+        "count": 2,
+        "value": "#2a2118"
+      },
+      {
+        "count": 2,
+        "value": "#ffecc82e"
+      },
+      {
+        "count": 1,
+        "value": "#1877f2"
+      },
+      {
+        "count": 1,
+        "value": "#d9962b"
+      },
+      {
+        "count": 1,
+        "value": "#a8483a"
+      },
+      {
+        "count": 1,
+        "value": "#5d6b82"
+      },
+      {
+        "count": 1,
+        "value": "#fff8ec1a"
+      },
+      {
+        "count": 1,
+        "value": "#221a128c"
+      },
+      {
+        "count": 1,
+        "value": "#140e0959"
+      },
+      {
+        "count": 1,
+        "value": "#261c14f2"
+      },
+      {
+        "count": 1,
+        "value": "#e9c27a"
+      },
+      {
+        "count": 1,
+        "value": "#ffe4b4d9"
+      }
+    ],
+    "css_variables": {
+      "--font": "\"Be Vietnam Pro\", system-ui, sans-serif",
+      "--glass": "rgba(34, 26, 18, .46)",
+      "--glass-strong": "rgba(34, 26, 18, .68)",
+      "--gold": "#e9c27a",
+      "--ink": "#fff8ec",
+      "--ink-soft": "rgba(255, 248, 236, .72)",
+      "--line": "rgba(255, 236, 200, .18)",
+      "--mq": "calc(var(--pinned-height) + var(--ticker-height))",
+      "--pinned-height": "0px",
+      "--serif": "\"Lora\", Georgia, serif",
+      "--son": "#b5432f",
+      "--ticker-height": "0px"
+    },
+    "font_faces": [
+      {
+        "family": "Be Vietnam Pro",
+        "status": "loaded",
+        "style": "normal",
+        "weight": "400"
+      },
+      {
+        "family": "Be Vietnam Pro",
+        "status": "loaded",
+        "style": "normal",
+        "weight": "400"
+      },
+      {
+        "family": "Be Vietnam Pro",
+        "status": "loaded",
+        "style": "normal",
+        "weight": "400"
+      },
+      {
+        "family": "Be Vietnam Pro",
+        "status": "loaded",
+        "style": "normal",
+        "weight": "500"
+      },
+      {
+        "family": "Be Vietnam Pro",
+        "status": "loaded",
+        "style": "normal",
+        "weight": "500"
+      },
+      {
+        "family": "Be Vietnam Pro",
+        "status": "loaded",
+        "style": "normal",
+        "weight": "500"
+      },
+      {
+        "family": "Be Vietnam Pro",
+        "status": "loaded",
+        "style": "normal",
+        "weight": "600"
+      },
+      {
+        "family": "Be Vietnam Pro",
+        "status": "loaded",
+        "style": "normal",
+        "weight": "600"
+      },
+      {
+        "family": "Be Vietnam Pro",
+        "status": "loaded",
+        "style": "normal",
+        "weight": "600"
+      },
+      {
+        "family": "Lora",
+        "status": "unloaded",
+        "style": "normal",
+        "weight": "500"
+      },
+      {
+        "family": "Lora",
+        "status": "unloaded",
+        "style": "normal",
+        "weight": "500"
+      },
+      {
+        "family": "Lora",
+        "status": "unloaded",
+        "style": "normal",
+        "weight": "500"
+      },
+      {
+        "family": "Lora",
+        "status": "unloaded",
+        "style": "normal",
+        "weight": "500"
+      },
+      {
+        "family": "Lora",
+        "status": "loaded",
+        "style": "normal",
+        "weight": "500"
+      },
+      {
+        "family": "Lora",
+        "status": "loaded",
+        "style": "normal",
+        "weight": "500"
+      },
+      {
+        "family": "Lora",
+        "status": "loaded",
+        "style": "normal",
+        "weight": "500"
+      },
+      {
+        "family": "Lora",
+        "status": "unloaded",
+        "style": "normal",
+        "weight": "600"
+      },
+      {
+        "family": "Lora",
+        "status": "unloaded",
+        "style": "normal",
+        "weight": "600"
+      },
+      {
+        "family": "Lora",
+        "status": "unloaded",
+        "style": "normal",
+        "weight": "600"
+      },
+      {
+        "family": "Lora",
+        "status": "unloaded",
+        "style": "normal",
+        "weight": "600"
+      },
+      {
+        "family": "Lora",
+        "status": "loaded",
+        "style": "normal",
+        "weight": "600"
+      },
+      {
+        "family": "Lora",
+        "status": "loaded",
+        "style": "normal",
+        "weight": "600"
+      },
+      {
+        "family": "Lora",
+        "status": "loaded",
+        "style": "normal",
+        "weight": "600"
+      }
+    ],
+    "font_sizes": [
+      {
+        "count": 29,
+        "value": "13px"
+      },
+      {
+        "count": 7,
+        "value": "12px"
+      },
+      {
+        "count": 4,
+        "value": "14px"
+      },
+      {
+        "count": 2,
+        "value": "15px"
+      },
+      {
+        "count": 1,
+        "value": "16px"
+      },
+      {
+        "count": 1,
+        "value": "10px"
+      },
+      {
+        "count": 1,
+        "value": "19px"
+      },
+      {
+        "count": 1,
+        "value": "34px"
+      }
+    ],
+    "font_weights": [
+      {
+        "count": 41,
+        "value": "400"
+      },
+      {
+        "count": 3,
+        "value": "600"
+      },
+      {
+        "count": 2,
+        "value": "500"
+      }
+    ],
+    "fonts": [
+      {
+        "count": 42,
+        "value": "\"Be Vietnam Pro\", system-ui, sans-serif"
+      },
+      {
+        "count": 4,
+        "value": "Lora, Georgia, serif"
+      }
+    ],
+    "max_widths": [
+      {
+        "count": 1,
+        "value": "560px"
+      },
+      {
+        "count": 1,
+        "value": "720px"
+      },
+      {
+        "count": 1,
+        "value": "300px"
+      }
+    ],
+    "radii": [
+      {
+        "count": 28,
+        "value": "14px"
+      },
+      {
+        "count": 18,
+        "value": "999px"
+      },
+      {
+        "count": 6,
+        "value": "16px"
+      },
+      {
+        "count": 2,
+        "value": "22px"
+      },
+      {
+        "count": 1,
+        "value": "2px"
+      }
+    ],
+    "shadows": [
+      {
+        "count": 1,
+        "value": "rgba(0, 0, 0, 0.4) 0px 10px 40px 0px"
+      },
+      {
+        "count": 1,
+        "value": "rgba(0, 0, 0, 0.35) 0px 2px 10px 0px"
+      }
+    ],
+    "spacing": [
+      {
+        "count": 58,
+        "value": "14px"
+      },
+      {
+        "count": 56,
+        "value": "7px"
+      },
+      {
+        "count": 19,
+        "value": "6px"
+      },
+      {
+        "count": 18,
+        "value": "10px"
+      },
+      {
+        "count": 18,
+        "value": "4px"
+      },
+      {
+        "count": 16,
+        "value": "8px"
+      },
+      {
+        "count": 4,
+        "value": "18px"
+      },
+      {
+        "count": 4,
+        "value": "16px"
+      },
+      {
+        "count": 3,
+        "value": "12px"
+      },
+      {
+        "count": 2,
+        "value": "2px"
+      },
+      {
+        "count": 2,
+        "value": "9px"
+      },
+      {
+        "count": 2,
+        "value": "20px"
+      }
+    ],
+    "text_colors": [
+      {
+        "count": 38,
+        "value": "#fff8ec"
+      },
+      {
+        "count": 4,
+        "value": "#e9c27a"
+      },
+      {
+        "count": 2,
+        "value": "#fff8ecb8"
+      },
+      {
+        "count": 1,
+        "value": "#d8cfc0"
+      },
+      {
+        "count": 1,
+        "value": "#2a1a0c"
+      }
+    ]
+  },
+  "forms": [],
+  "headings": [],
+  "health": {
+    "errors": [],
+    "failed_requests": []
+  },
+  "lang": "vi",
+  "layouts": [
+    {
+      "blocks": [
+        {
+          "gap": 6,
+          "h": 42,
+          "pad": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "per_row": 1,
+          "tag": "nav",
+          "w": 1412,
+          "y": 844
+        }
+      ],
+      "page_h": 900,
+      "page_w": 1440,
+      "type": {
+        "body": 15,
+        "h1": 0,
+        "h2": 0,
+        "h3": 0
+      },
+      "width": 1440
+    },
+    {
+      "blocks": [
+        {
+          "gap": 6,
+          "h": 42,
+          "pad": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "per_row": 16,
+          "tag": "nav",
+          "w": 740,
+          "y": 844
+        }
+      ],
+      "page_h": 900,
+      "page_w": 768,
+      "type": {
+        "body": 15,
+        "h1": 0,
+        "h2": 0,
+        "h3": 0
+      },
+      "width": 768
+    },
+    {
+      "blocks": [
+        {
+          "gap": 6,
+          "h": 42,
+          "pad": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "per_row": 28,
+          "tag": "nav",
+          "w": 362,
+          "y": 844
+        }
+      ],
+      "page_h": 900,
+      "page_w": 390,
+      "type": {
+        "body": 15,
+        "h1": 0,
+        "h2": 0,
+        "h3": 0
+      },
+      "width": 390
+    }
+  ],
+  "links": [],
+  "meta": {
+    "description": "An Tự Duyên — lên chùa cầu an, gặp người có duyên. Ngôi chùa 3D trên trình duyệt, vào ngay không cần đăng nhập.",
+    "icons": [
+      "https://didenchua.online/icons/icon-192.png",
+      "https://didenchua.online/icons/apple-touch-icon.png"
+    ],
+    "og_image": "/icons/icon-512.png",
+    "og_title": "An Tự Duyên · Chùa online",
+    "theme_color": "#1d1610"
+  },
+  "outline": [
+    {
+      "background": "#221a1275",
+      "box": {
+        "h": 38,
+        "w": 216,
+        "x": 14,
+        "y": 38
+      },
+      "class": "pill zone-pill",
+      "color": "#fff8ec",
+      "depth": 3,
+      "font": "14px 400",
+      "role": "button",
+      "tag": "div",
+      "text": "An Tự Duyên Cả chùa"
+    },
+    {
+      "background": "#1877f2",
+      "box": {
+        "h": 40,
+        "w": 40,
+        "x": 1242,
+        "y": 38
+      },
+      "class": "icon-btn icon-fb",
+      "color": "#ffffff",
+      "depth": 4,
+      "font": "13.3333px 400",
+      "tag": "button"
+    },
+    {
+      "box": {
+        "h": 20,
+        "w": 20,
+        "x": 1252,
+        "y": 48
+      },
+      "color": "#ffffff",
+      "depth": 5,
+      "font": "13.3333px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#d9962b",
+      "box": {
+        "h": 40,
+        "w": 40,
+        "x": 1290,
+        "y": 38
+      },
+      "class": "icon-btn icon-gao",
+      "color": "#2c1a06",
+      "depth": 4,
+      "font": "13.3333px 400",
+      "tag": "button"
+    },
+    {
+      "box": {
+        "h": 20,
+        "w": 20,
+        "x": 1300,
+        "y": 48
+      },
+      "color": "#2c1a06",
+      "depth": 5,
+      "font": "13.3333px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#a8483a",
+      "box": {
+        "h": 40,
+        "w": 40,
+        "x": 1338,
+        "y": 38
+      },
+      "class": "icon-btn icon-sound off",
+      "color": "#ffffff",
+      "depth": 4,
+      "font": "13.3333px 400",
+      "tag": "button"
+    },
+    {
+      "box": {
+        "h": 20,
+        "w": 20,
+        "x": 1348,
+        "y": 48
+      },
+      "color": "#ffffff",
+      "depth": 5,
+      "font": "13.3333px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#5d6b82",
+      "box": {
+        "h": 40,
+        "w": 40,
+        "x": 1386,
+        "y": 38
+      },
+      "class": "icon-btn icon-gear",
+      "color": "#ffffff",
+      "depth": 4,
+      "font": "13.3333px 400",
+      "tag": "button"
+    },
+    {
+      "box": {
+        "h": 20,
+        "w": 20,
+        "x": 1396,
+        "y": 48
+      },
+      "color": "#ffffff",
+      "depth": 5,
+      "font": "13.3333px 400",
+      "tag": "svg"
+    },
+    {
+      "box": {
+        "h": 55,
+        "w": 90,
+        "x": 476,
+        "y": 716
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "12px 400",
+      "tag": "button",
+      "text": "Thắp hương"
+    },
+    {
+      "box": {
+        "h": 22,
+        "w": 22,
+        "x": 510,
+        "y": 724
+      },
+      "color": "#fff8ec",
+      "depth": 5,
+      "font": "12px 400",
+      "tag": "svg"
+    },
+    {
+      "box": {
+        "h": 55,
+        "w": 84,
+        "x": 572,
+        "y": 716
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "12px 400",
+      "tag": "button",
+      "text": "Lời nguyện"
+    },
+    {
+      "box": {
+        "h": 22,
+        "w": 22,
+        "x": 603,
+        "y": 724
+      },
+      "color": "#fff8ec",
+      "depth": 5,
+      "font": "12px 400",
+      "tag": "svg"
+    },
+    {
+      "box": {
+        "h": 55,
+        "w": 64,
+        "x": 662,
+        "y": 716
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "12px 400",
+      "tag": "button",
+      "text": "Quét lá"
+    },
+    {
+      "box": {
+        "h": 22,
+        "w": 22,
+        "x": 683,
+        "y": 724
+      },
+      "color": "#fff8ec",
+      "depth": 5,
+      "font": "12px 400",
+      "tag": "svg"
+    },
+    {
+      "box": {
+        "h": 55,
+        "w": 76,
+        "x": 732,
+        "y": 716
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "12px 400",
+      "tag": "button",
+      "text": "Tràng hạt"
+    },
+    {
+      "box": {
+        "h": 22,
+        "w": 22,
+        "x": 759,
+        "y": 724
+      },
+      "color": "#fff8ec",
+      "depth": 5,
+      "font": "12px 400",
+      "tag": "svg"
+    },
+    {
+      "box": {
+        "h": 55,
+        "w": 75,
+        "x": 814,
+        "y": 716
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "12px 400",
+      "tag": "button",
+      "text": "Động tác"
+    },
+    {
+      "box": {
+        "h": 22,
+        "w": 22,
+        "x": 840,
+        "y": 724
+      },
+      "color": "#fff8ec",
+      "depth": 5,
+      "font": "12px 400",
+      "tag": "svg"
+    },
+    {
+      "box": {
+        "h": 55,
+        "w": 69,
+        "x": 895,
+        "y": 716
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "12px 400",
+      "tag": "button",
+      "text": "Máy chủ"
+    },
+    {
+      "box": {
+        "h": 22,
+        "w": 22,
+        "x": 918,
+        "y": 724
+      },
+      "color": "#fff8ec",
+      "depth": 5,
+      "font": "12px 400",
+      "tag": "svg"
+    },
+    {
+      "box": {
+        "h": 38,
+        "w": 38,
+        "x": 445,
+        "y": 791
+      },
+      "class": "chat-icon",
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13.3333px 400",
+      "tag": "button"
+    },
+    {
+      "box": {
+        "h": 21,
+        "w": 21,
+        "x": 454,
+        "y": 800
+      },
+      "color": "#fff8ec",
+      "depth": 5,
+      "font": "13.3333px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#fff8ec1a",
+      "box": {
+        "h": 38,
+        "w": 310,
+        "x": 487,
+        "y": 791
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "15px 400",
+      "name": "",
+      "placeholder": "Nói gì đó…",
+      "tag": "input",
+      "type": "text"
+    },
+    {
+      "box": {
+        "h": 38,
+        "w": 38,
+        "x": 801,
+        "y": 791
+      },
+      "class": "chat-icon send",
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13.3333px 400",
+      "tag": "button"
+    },
+    {
+      "box": {
+        "h": 21,
+        "w": 21,
+        "x": 810,
+        "y": 800
+      },
+      "color": "#fff8ec",
+      "depth": 5,
+      "font": "13.3333px 400",
+      "tag": "svg"
+    },
+    {
+      "box": {
+        "h": 38,
+        "w": 38,
+        "x": 843,
+        "y": 791
+      },
+      "class": "chat-icon",
+      "color": "#fff8ec",
+      "depth": 5,
+      "font": "13.3333px 400",
+      "tag": "button"
+    },
+    {
+      "box": {
+        "h": 21,
+        "w": 21,
+        "x": 852,
+        "y": 800
+      },
+      "color": "#fff8ec",
+      "depth": 6,
+      "font": "13.3333px 400",
+      "tag": "svg"
+    },
+    {
+      "box": {
+        "h": 38,
+        "w": 38,
+        "x": 881,
+        "y": 791
+      },
+      "class": "chat-icon",
+      "color": "#fff8ec",
+      "depth": 5,
+      "font": "13.3333px 400",
+      "tag": "button"
+    },
+    {
+      "box": {
+        "h": 21,
+        "w": 21,
+        "x": 890,
+        "y": 800
+      },
+      "color": "#fff8ec",
+      "depth": 6,
+      "font": "13.3333px 400",
+      "tag": "svg"
+    },
+    {
+      "box": {
+        "h": 38,
+        "w": 38,
+        "x": 919,
+        "y": 791
+      },
+      "class": "chat-icon",
+      "color": "#fff8ec",
+      "depth": 5,
+      "font": "13.3333px 400",
+      "tag": "button"
+    },
+    {
+      "box": {
+        "h": 21,
+        "w": 21,
+        "x": 928,
+        "y": 800
+      },
+      "color": "#fff8ec",
+      "depth": 6,
+      "font": "13.3333px 400",
+      "tag": "svg"
+    },
+    {
+      "box": {
+        "h": 38,
+        "w": 38,
+        "x": 957,
+        "y": 791
+      },
+      "class": "chat-icon",
+      "color": "#fff8ec",
+      "depth": 5,
+      "font": "13.3333px 400",
+      "tag": "button"
+    },
+    {
+      "box": {
+        "h": 21,
+        "w": 21,
+        "x": 966,
+        "y": 800
+      },
+      "color": "#fff8ec",
+      "depth": 6,
+      "font": "13.3333px 400",
+      "tag": "svg"
+    },
+    {
+      "box": {
+        "h": 16,
+        "w": 16,
+        "x": 349,
+        "y": 4
+      },
+      "color": "#f3c46a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#221a1275",
+      "box": {
+        "h": 32,
+        "w": 57,
+        "x": 24,
+        "y": 86
+      },
+      "class": "pill friends-pill",
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13px 400",
+      "tag": "button",
+      "text": "0"
+    },
+    {
+      "box": {
+        "h": 18,
+        "w": 18,
+        "x": 35,
+        "y": 93
+      },
+      "color": "#e9c27a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "box": {
+        "h": 42,
+        "w": 1412,
+        "x": 14,
+        "y": 844
+      },
+      "class": "menu-bar",
+      "color": "#fff8ec",
+      "depth": 3,
+      "display": "flex",
+      "flex": "row",
+      "font": "16px 400",
+      "tag": "nav"
+    },
+    {
+      "background": "#221a12ad",
+      "box": {
+        "h": 42,
+        "w": 117,
+        "x": 14,
+        "y": 844
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13px 400",
+      "tag": "button",
+      "text": "Thời khóa"
+    },
+    {
+      "box": {
+        "h": 18,
+        "w": 18,
+        "x": 29,
+        "y": 856
+      },
+      "color": "#e9c27a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#221a12ad",
+      "box": {
+        "h": 42,
+        "w": 110,
+        "x": 137,
+        "y": 844
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13px 400",
+      "tag": "button",
+      "text": "Tĩnh tâm"
+    },
+    {
+      "box": {
+        "h": 18,
+        "w": 18,
+        "x": 152,
+        "y": 856
+      },
+      "color": "#e9c27a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#221a12ad",
+      "box": {
+        "h": 42,
+        "w": 96,
+        "x": 254,
+        "y": 844
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13px 400",
+      "tag": "button",
+      "text": "Sổ sen"
+    },
+    {
+      "box": {
+        "h": 18,
+        "w": 18,
+        "x": 269,
+        "y": 856
+      },
+      "color": "#e9c27a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#221a12ad",
+      "box": {
+        "h": 42,
+        "w": 105,
+        "x": 356,
+        "y": 844
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13px 400",
+      "tag": "button",
+      "text": "Mời bạn"
+    },
+    {
+      "box": {
+        "h": 18,
+        "w": 18,
+        "x": 371,
+        "y": 856
+      },
+      "color": "#e9c27a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#221a12ad",
+      "box": {
+        "h": 42,
+        "w": 125,
+        "x": 468,
+        "y": 844
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13px 400",
+      "tag": "button",
+      "text": "Cộng đồng"
+    },
+    {
+      "box": {
+        "h": 18,
+        "w": 18,
+        "x": 483,
+        "y": 856
+      },
+      "color": "#e9c27a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#221a12ad",
+      "box": {
+        "h": 42,
+        "w": 113,
+        "x": 599,
+        "y": 844
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13px 400",
+      "tag": "button",
+      "text": "Nhiệm vụ"
+    },
+    {
+      "box": {
+        "h": 18,
+        "w": 18,
+        "x": 614,
+        "y": 856
+      },
+      "color": "#e9c27a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#221a12ad",
+      "box": {
+        "h": 42,
+        "w": 152,
+        "x": 718,
+        "y": 844
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13px 400",
+      "tag": "button",
+      "text": "Hỏi ban quản lý"
+    },
+    {
+      "box": {
+        "h": 18,
+        "w": 18,
+        "x": 733,
+        "y": 856
+      },
+      "color": "#e9c27a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#221a12ad",
+      "box": {
+        "h": 42,
+        "w": 93,
+        "x": 876,
+        "y": 844
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13px 400",
+      "tag": "button",
+      "text": "Túi đồ"
+    },
+    {
+      "box": {
+        "h": 18,
+        "w": 18,
+        "x": 891,
+        "y": 856
+      },
+      "color": "#e9c27a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#221a12ad",
+      "box": {
+        "h": 42,
+        "w": 134,
+        "x": 976,
+        "y": 844
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13px 400",
+      "tag": "button",
+      "text": "Bản đồ chùa"
+    },
+    {
+      "box": {
+        "h": 18,
+        "w": 18,
+        "x": 991,
+        "y": 856
+      },
+      "color": "#e9c27a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#221a12ad",
+      "box": {
+        "h": 42,
+        "w": 153,
+        "x": 1116,
+        "y": 844
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13px 400",
+      "tag": "button",
+      "text": "Am riêng tu tập"
+    },
+    {
+      "box": {
+        "h": 18,
+        "w": 18,
+        "x": 1131,
+        "y": 856
+      },
+      "color": "#e9c27a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#221a12ad",
+      "box": {
+        "h": 42,
+        "w": 131,
+        "x": 1275,
+        "y": 844
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13px 400",
+      "tag": "button",
+      "text": "Pháp đường"
+    },
+    {
+      "box": {
+        "h": 18,
+        "w": 18,
+        "x": 1290,
+        "y": 856
+      },
+      "color": "#e9c27a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#221a12ad",
+      "box": {
+        "h": 42,
+        "w": 146,
+        "x": 1412,
+        "y": 844
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13px 400",
+      "tag": "button",
+      "text": "Tàng Kinh Các"
+    },
+    {
+      "box": {
+        "h": 18,
+        "w": 18,
+        "x": 1427,
+        "y": 856
+      },
+      "color": "#e9c27a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#221a12ad",
+      "box": {
+        "h": 42,
+        "w": 157,
+        "x": 1565,
+        "y": 844
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13px 400",
+      "tag": "button",
+      "text": "Xin chữ Thầy đồ"
+    },
+    {
+      "box": {
+        "h": 18,
+        "w": 18,
+        "x": 1580,
+        "y": 856
+      },
+      "color": "#e9c27a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#221a12ad",
+      "box": {
+        "h": 42,
+        "w": 97,
+        "x": 1727,
+        "y": 844
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13px 400",
+      "tag": "button",
+      "text": "Tủ chữ"
+    },
+    {
+      "box": {
+        "h": 18,
+        "w": 18,
+        "x": 1742,
+        "y": 856
+      },
+      "color": "#e9c27a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#221a12ad",
+      "box": {
+        "h": 42,
+        "w": 116,
+        "x": 1831,
+        "y": 844
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13px 400",
+      "tag": "button",
+      "text": "Xếp hạng"
+    },
+    {
+      "box": {
+        "h": 18,
+        "w": 18,
+        "x": 1846,
+        "y": 856
+      },
+      "color": "#e9c27a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#221a12ad",
+      "box": {
+        "h": 42,
+        "w": 132,
+        "x": 1952,
+        "y": 844
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13px 400",
+      "tag": "button",
+      "text": "Bạn đồng tu"
+    },
+    {
+      "box": {
+        "h": 18,
+        "w": 18,
+        "x": 1967,
+        "y": 856
+      },
+      "color": "#e9c27a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#221a12ad",
+      "box": {
+        "h": 42,
+        "w": 124,
+        "x": 2090,
+        "y": 844
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13px 400",
+      "tag": "button",
+      "text": "Lời nguyện"
+    },
+    {
+      "box": {
+        "h": 18,
+        "w": 18,
+        "x": 2105,
+        "y": 856
+      },
+      "color": "#e9c27a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#221a12ad",
+      "box": {
+        "h": 42,
+        "w": 95,
+        "x": 2220,
+        "y": 844
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13px 400",
+      "tag": "button",
+      "text": "Đố vui"
+    },
+    {
+      "box": {
+        "h": 18,
+        "w": 18,
+        "x": 2235,
+        "y": 856
+      },
+      "color": "#e9c27a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#221a12ad",
+      "box": {
+        "h": 42,
+        "w": 105,
+        "x": 2321,
+        "y": 844
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13px 400",
+      "tag": "button",
+      "text": "Linh thú"
+    },
+    {
+      "box": {
+        "h": 18,
+        "w": 18,
+        "x": 2336,
+        "y": 856
+      },
+      "color": "#e9c27a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#221a12ad",
+      "box": {
+        "h": 42,
+        "w": 119,
+        "x": 2432,
+        "y": 844
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13px 400",
+      "tag": "button",
+      "text": "Hạc trắng"
+    },
+    {
+      "box": {
+        "h": 18,
+        "w": 18,
+        "x": 2447,
+        "y": 856
+      },
+      "color": "#e9c27a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#221a12ad",
+      "box": {
+        "h": 42,
+        "w": 83,
+        "x": 2557,
+        "y": 844
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13px 400",
+      "tag": "button",
+      "text": "Trâu"
+    },
+    {
+      "box": {
+        "h": 18,
+        "w": 18,
+        "x": 2572,
+        "y": 856
+      },
+      "color": "#e9c27a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#221a12ad",
+      "box": {
+        "h": 42,
+        "w": 111,
+        "x": 2646,
+        "y": 844
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13px 400",
+      "tag": "button",
+      "text": "Rùa thần"
+    },
+    {
+      "box": {
+        "h": 18,
+        "w": 18,
+        "x": 2661,
+        "y": 856
+      },
+      "color": "#e9c27a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#221a12ad",
+      "box": {
+        "h": 42,
+        "w": 118,
+        "x": 2763,
+        "y": 844
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13px 400",
+      "tag": "button",
+      "text": "Hạt bồ đề"
+    },
+    {
+      "box": {
+        "h": 18,
+        "w": 18,
+        "x": 2778,
+        "y": 856
+      },
+      "color": "#e9c27a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#221a12ad",
+      "box": {
+        "h": 42,
+        "w": 119,
+        "x": 2887,
+        "y": 844
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13px 400",
+      "tag": "button",
+      "text": "Kết duyên"
+    },
+    {
+      "box": {
+        "h": 18,
+        "w": 18,
+        "x": 2902,
+        "y": 856
+      },
+      "color": "#e9c27a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#221a12ad",
+      "box": {
+        "h": 42,
+        "w": 91,
+        "x": 3011,
+        "y": 844
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13px 400",
+      "tag": "button",
+      "text": "Hồ sơ"
+    },
+    {
+      "box": {
+        "h": 18,
+        "w": 18,
+        "x": 3026,
+        "y": 856
+      },
+      "color": "#e9c27a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#221a12ad",
+      "box": {
+        "h": 42,
+        "w": 110,
+        "x": 3108,
+        "y": 844
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13px 400",
+      "tag": "button",
+      "text": "Góp gạo"
+    },
+    {
+      "box": {
+        "h": 18,
+        "w": 18,
+        "x": 3123,
+        "y": 856
+      },
+      "color": "#e9c27a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#221a12ad",
+      "box": {
+        "h": 42,
+        "w": 93,
+        "x": 3224,
+        "y": 844
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13px 400",
+      "tag": "button",
+      "text": "Góp ý"
+    },
+    {
+      "box": {
+        "h": 18,
+        "w": 18,
+        "x": 3239,
+        "y": 856
+      },
+      "color": "#e9c27a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "background": "#221a12ad",
+      "box": {
+        "h": 42,
+        "w": 103,
+        "x": 3323,
+        "y": 844
+      },
+      "color": "#fff8ec",
+      "depth": 4,
+      "font": "13px 400",
+      "tag": "button",
+      "text": "Cài đặt"
+    },
+    {
+      "box": {
+        "h": 18,
+        "w": 18,
+        "x": 3338,
+        "y": 856
+      },
+      "color": "#e9c27a",
+      "depth": 5,
+      "font": "13px 400",
+      "tag": "svg"
+    },
+    {
+      "box": {
+        "h": 45,
+        "w": 302,
+        "x": 569,
+        "y": 417
+      },
+      "color": "#fff8ec",
+      "depth": 5,
+      "font": "15px 400",
+      "tag": "p",
+      "text": "Lư hương ở ngay trước mặt bạn. Chỉ một chạm là dâng được nén hương đầu tiên."
+    },
+    {
+      "box": {
+        "h": 40,
+        "w": 99,
+        "x": 650,
+        "y": 476
+      },
+      "class": "ghost small",
+      "color": "#fff8ec",
+      "depth": 6,
+      "font": "14px 500",
+      "tag": "button",
+      "text": "Tự đi dạo"
+    },
+    {
+      "box": {
+        "h": 40,
+        "w": 114,
+        "x": 757,
+        "y": 476
+      },
+      "class": "primary small",
+      "color": "#2a1a0c",
+      "depth": 6,
+      "font": "14px 500",
+      "tag": "button",
+      "text": "Thắp hương"
+    }
+  ],
+  "page": {
+    "h": 900,
+    "w": 1440
+  },
+  "text": "An Tự Duyên Cả chùa Khu trò chuyện dành cho người từ 18 tuổi · nói chuyện lịch sự nhé Thắp hương Lời nguyện Quét lá Tràng hạt Động tác Máy chủ Gió Non Sơ tâm 0 Thời khóa Tĩnh tâm Sổ sen Mời bạn Cộng đồng Nhiệm vụ Hỏi ban quản lý Túi đồ Bản đồ chùa Am riêng tu tập Pháp đường Tàng Kinh Các Xin chữ Thầy đồ Tủ chữ Xếp hạng Bạn đồng tu Lời nguyện Đố vui Linh thú Hạc trắng Trâu Rùa thần Hạt bồ đề Kết duyên Hồ sơ Góp gạo Góp ý Cài đặt Mời bạn vào chùa Lư hương ở ngay trước mặt bạn. Chỉ một chạm là dâng được nén hương đầu tiên. Tự đi dạo Thắp hương An Tự Duyên Đang mở cổng chùa… “Buông bớt một điều, nhẹ thêm một bước.”",
+  "title": "An Tự Duyên · Chùa online",
+  "unreadable_stylesheets": 1,
+  "url": "https://didenchua.online/?phong=chua-1",
+  "viewport": {
+    "h": 900,
+    "w": 1440
+  }
+}
