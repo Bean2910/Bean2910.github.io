@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { createRequire } from 'node:module';
+import { computeRaceSlot, createRaceTracker, evaluateRaceTick } from '../race_schedule.js';
 
 const require = createRequire('D:/python/didenchua/server/package.json');
 const { WebSocket } = require('ws');
@@ -102,22 +103,79 @@ class TestClient {
 try {
   await waitForReady();
 
+  // 0. Pure 10-minute VN race schedule boundary checks (10h00 -> 10h10, joinOpen 90s window, warnings at 3p/2p/1p)
+  const mkVnMs = (hh, mm, ss = 0) => Date.UTC(2026, 10, 16, hh - 7, mm, ss);
+  const s0956 = computeRaceSlot(mkVnMs(9, 56, 59), { intervalMin: 10 });
+  assert.equal(s0956.nextLabel, '10h00');
+  assert.equal(s0956.warnMin, 0);
+  assert.equal(s0956.joinOpen, false);
+  assert.equal(computeRaceSlot(mkVnMs(10, 0, 10), { intervalMin: 10 }).joinOpen, true);
+  assert.equal(computeRaceSlot(mkVnMs(10, 1, 29), { intervalMin: 10 }).joinOpen, true);
+  assert.equal(computeRaceSlot(mkVnMs(10, 1, 31), { intervalMin: 10 }).joinOpen, false);
+  const trk = createRaceTracker(mkVnMs(9, 50, 5), { intervalMin: 10 });
+  assert.equal(evaluateRaceTick(trk, mkVnMs(9, 56, 59), { intervalMin: 10 }).event, null);
+  const t3 = evaluateRaceTick(trk, mkVnMs(9, 57, 0), { intervalMin: 10 });
+  assert.equal(t3.event, 'warn');
+  assert.equal(t3.minsLeft, 3);
+  assert.equal(evaluateRaceTick(trk, mkVnMs(9, 57, 30), { intervalMin: 10 }).event, null);
+  const t2 = evaluateRaceTick(trk, mkVnMs(9, 58, 0), { intervalMin: 10 });
+  assert.equal(t2.event, 'warn');
+  assert.equal(t2.minsLeft, 2);
+  const t1 = evaluateRaceTick(trk, mkVnMs(9, 59, 0), { intervalMin: 10 });
+  assert.equal(t1.event, 'warn');
+  assert.equal(t1.minsLeft, 1);
+  const tStart = evaluateRaceTick(trk, mkVnMs(10, 0, 0), { intervalMin: 10 });
+  assert.equal(tStart.event, 'start');
+  assert.equal(tStart.slot.curLabel, '10h00');
+  assert.equal(tStart.slot.nextLabel, '10h10');
+  for (let m = 10; m <= 50; m += 10) {
+    assert.equal(computeRaceSlot(mkVnMs(10, m, 0), { intervalMin: 10 }).curLabel, `10h${String(m).padStart(2, '0')}`);
+  }
+  assert.equal(computeRaceSlot(mkVnMs(11, 0, 0), { intervalMin: 10 }).curLabel, '11h00');
+
   // 1. Check HTTP endpoints + Admin GUI static assets & state API
   const passRes = await fetch(`http://127.0.0.1:${PORT}/api/pass`).then((r) => r.json());
   assert.deepEqual(passRes, { off: true });
   const htmlRes = await fetch(`http://127.0.0.1:${PORT}/`);
   assert.equal(htmlRes.status, 200);
   assert.equal(htmlRes.headers.get('cache-control'), 'no-cache');
+  assert.equal((await fetch(`http://127.0.0.1:${PORT}/sw.js`)).status, 404);
   const htmlText = await htmlRes.text();
-  assert.ok(htmlText.includes('main-CPNz0KLo.js?v=2026111609'));
-  const jsRes = await fetch(`http://127.0.0.1:${PORT}/assets/main-CPNz0KLo.js?v=2026111609`);
+  assert.ok(htmlText.includes('main-CPNz0KLo.js?v=2026111618'));
+  const jsRes = await fetch(`http://127.0.0.1:${PORT}/assets/main-CPNz0KLo.js?v=2026111618`);
   assert.equal(jsRes.status, 200);
   assert.equal(jsRes.headers.get('cache-control'), 'no-cache');
   const jsText = await jsRes.text();
   assert.ok(jsText.includes('freeLook'));
+  assert.ok(jsText.includes('RaceSys'));
+  assert.ok(jsText.includes('_rtGenMap'));
+  assert.ok(jsText.includes('_rtHitLogs'));
+  assert.ok(jsText.includes('_rtInPuddle'));
+  assert.ok(jsText.includes('duadrift'));
+  assert.ok(jsText.includes('keys.has("control")'));
+  assert.ok(jsText.includes('race-sched'));
+  assert.ok(jsText.includes('spawnAmbient'));
+  assert.ok(jsText.includes('sieu_xe_hieu_ung_khoi.glb'));
+  assert.ok(jsText.includes('_stepCarVisual'));
+  assert.ok(jsText.includes('DtFx'));
+  assert.ok(jsText.includes('HmFx'));
+  assert.ok(jsText.includes('bach_long_ma.glb'));
+  assert.ok(jsText.includes('ton_ngo_khong.glb'));
+  assert.ok(jsText.includes('tru_ngo_nang.glb'));
+  assert.ok(jsText.includes('sa_ngo_tinh.glb'));
+  for (const mdl of ['sieu_xe_hieu_ung_khoi', 'ton_ngo_khong', 'tru_ngo_nang', 'sa_ngo_tinh', 'bach_long_ma']) {
+    const glbRes = await fetch(`http://127.0.0.1:${PORT}/models/${mdl}.glb?v=2026111618`);
+    assert.equal(glbRes.status, 200);
+    const glbBuf = Buffer.from(await glbRes.arrayBuffer());
+    assert.equal(glbBuf.toString('utf8', 0, 4), 'glTF');
+  }
   const adminHtmlRes = await fetch(`http://127.0.0.1:${PORT}/admin`);
   assert.equal(adminHtmlRes.status, 200);
-  assert.ok((await adminHtmlRes.text()).includes('Quản Trị Chùa'));
+  const adminHtmlText = await adminHtmlRes.text();
+  assert.ok(adminHtmlText.includes('Quản Trị Chùa'));
+  assert.ok(adminHtmlText.includes('raceBotCountInput'));
+  assert.ok(adminHtmlText.includes('raceMapModeSelect'));
+  assert.ok(adminHtmlText.includes('raceIntervalMinInput'));
   assert.equal((await fetch(`http://127.0.0.1:${PORT}/admin/admin.css`)).status, 200);
   assert.equal((await fetch(`http://127.0.0.1:${PORT}/admin/admin.js`)).status, 200);
 
@@ -125,6 +183,7 @@ try {
   assert.equal(adminInit.ok, true);
   assert.equal(adminInit.config.linhVatSessionCooldown, true);
   assert.equal(adminInit.config.allowFreeCraneAnytime, true);
+  assert.deepEqual(adminInit.config.buffaloRace, { enabled: true, botCount: 5, difficulty: 'trungbinh', mapMode: 'random', laps: 2, autoSchedule: true, intervalMin: 10, ambientBots: true });
 
   // 2. Connect Player A (brand new cid)
   const cidA = 'test-cid-alpha-001';
@@ -150,6 +209,9 @@ try {
   assert.equal(linhvatInit.hac.s, 0);
   assert.equal(linhvatInit.rua.s, 0);
   assert.deepEqual(linhvatInit.hac.fly, ['tudo']);
+  assert.deepEqual(linhvatInit.race, { enabled: true, botCount: 5, difficulty: 'trungbinh', mapMode: 'random', laps: 2, autoSchedule: true, intervalMin: 10, ambientBots: true });
+  assert.equal(linhvatInit.raceSched.intervalMin, 10);
+  assert.equal(linhvatInit.raceSched.autoSchedule, true);
 
   // 3. Verify garden, quiz, quiz-practice, so-sen, duyen
   cA.send({ t: 'garden' });
@@ -410,6 +472,75 @@ try {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ action: 'stop' })
   });
+
+  // 12. Admin buffaloRace configuration, 3p/2p/1p & start schedule broadcasts, + duatrau-done finish merit check
+  const raceCfgRes = await fetch(`http://127.0.0.1:${PORT}/api/admin/config`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ config: { buffaloRace: { enabled: true, botCount: 8, difficulty: 'cuckho', mapMode: 'extreme', laps: 3, autoSchedule: true, intervalMin: 10, ambientBots: true } } })
+  }).then((r) => r.json());
+  assert.equal(raceCfgRes.ok, true);
+  assert.deepEqual(raceCfgRes.state.config.buffaloRace, { enabled: true, botCount: 8, difficulty: 'cuckho', mapMode: 'extreme', laps: 3, autoSchedule: true, intervalMin: 10, ambientBots: true });
+  const raceLvPush = await cA2.waitFor((m) => m.t === 'linhvat' && m.race?.difficulty === 'cuckho');
+  assert.equal(raceLvPush.race.botCount, 8);
+  assert.equal(raceLvPush.race.mapMode, 'extreme');
+  assert.equal(raceLvPush.race.laps, 3);
+  assert.equal(raceLvPush.raceSched.intervalMin, 10);
+
+  for (const mLeft of [3, 2, 1]) {
+    await fetch(`http://127.0.0.1:${PORT}/api/admin/world`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ room: 'all', action: 'trigger-race-warn', minsLeft: mLeft })
+    });
+    const warnSched = await cA2.waitFor((m) => m.t === 'race-sched' && m.phase === 'warn' && m.minsLeft === mLeft);
+    assert.equal(warnSched.intervalMin, 10);
+    const warnAnn = await cA2.waitFor((m) => m.t === 'ann' && m.text?.includes(`sau ${mLeft} phút`));
+    assert.ok(warnAnn.text.includes('Cuộc đua trâu'));
+  }
+  await fetch(`http://127.0.0.1:${PORT}/api/admin/world`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ room: 'all', action: 'trigger-race-now' })
+  });
+  const startSched = await cA2.waitFor((m) => m.t === 'race-sched' && m.phase === 'start');
+  assert.ok(startSched.seed >= 1000);
+  assert.equal(startSched.joinOpen, true);
+  const startAnn = await cA2.waitFor((m) => m.t === 'ann' && m.text?.includes('đã chính thức bắt đầu'));
+  assert.ok(startAnn.text.includes('Giải đua trâu'));
+
+  cA2.send({ t: 'emote', e: 'dt-7' });
+  const dtOnBcast = await cA2.waitFor((m) => m.t === 'emote' && m.e === 'dt-7');
+  assert.equal(dtOnBcast.e, 'dt-7');
+  cA2.send({ t: 'emote', e: 'ma-1' });
+  const maOnBcast = await cA2.waitFor((m) => m.t === 'emote' && m.e === 'ma-1');
+  assert.equal(maOnBcast.e, 'ma-1');
+
+  const cidRace = 'test-cid-race-001';
+  const cRace = new TestClient();
+  await cRace.connect();
+  cRace.send({ t: 'hello', v: 2, cid: cidRace, name: 'Đua Trâu', room: 'chua-1' });
+  const raceWelcome = await cRace.waitFor((m) => m.t === 'welcome');
+  const peerAView = raceWelcome.peers.find((p) => p.pid === welcome.pid);
+  assert.equal(peerAView?.dt, 7);
+  assert.equal(peerAView?.ma, 1);
+  cA2.send({ t: 'emote', e: 'dt-0' });
+  const dtOffBcast = await cRace.waitFor((m) => m.t === 'emote' && m.e === 'dt-0');
+  assert.equal(dtOffBcast.e, 'dt-0');
+  cA2.send({ t: 'emote', e: 'ma-0' });
+  const maOffBcast = await cRace.waitFor((m) => m.t === 'emote' && m.e === 'ma-0');
+  assert.equal(maOffBcast.e, 'ma-0');
+  await cRace.waitFor((m) => m.t === 'merit');
+  const raceLvInit = await cRace.waitFor((m) => m.t === 'linhvat');
+  assert.equal(raceLvInit.race.botCount, 8);
+  assert.equal(raceLvInit.race.mapMode, 'extreme');
+  cRace.send({ t: 'duatrau-done', rank: 1, total: 9, diff: 'cuckho', sec: 68.5 });
+  const raceMerit = await cRace.waitFor((m) => m.t === 'merit' && m.gain?.n === 45);
+  assert.equal(raceMerit.me.total, 45);
+  const raceAnn = await cA2.waitFor((m) => m.t === 'ann' && m.text?.includes('Đua Trâu') && m.text?.includes('về Nhất'));
+  assert.ok(raceAnn.text.includes('Cực Khó'));
+  await cRace.close();
+
   await cA2.close();
   await new Promise((r) => setTimeout(r, 250));
 
@@ -422,8 +553,11 @@ try {
   assert.equal(savedDisk.characters[cidA].title, 'nguyen_lanh');
   assert.equal(savedDisk.characters[cidA].unlockedTitles.length, 17);
   assert.equal(savedDisk.characters[cidB].merit, 0);
+  assert.equal(savedDisk.characters[cidRace].merit, 45);
   assert.equal(savedDisk.accounts['nangxanh'], cidA);
   assert.equal(fs.existsSync(CONFIG_FILE), true);
+  const savedCfg = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
+  assert.deepEqual(savedCfg.buffaloRace, { enabled: true, botCount: 8, difficulty: 'cuckho', mapMode: 'extreme', laps: 3, autoSchedule: true, intervalMin: 10, ambientBots: true });
 
   console.log('ALL E2E ASSERTIONS PASSED!');
 } finally {

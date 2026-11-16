@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import crypto from 'node:crypto';
 import { WebSocketServer, WebSocket } from 'ws';
+import { computeRaceSlot, createRaceTracker, evaluateRaceTick, RACE_JOIN_WINDOW_SEC } from './race_schedule.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -114,6 +115,16 @@ function getDefaultConfig() {
     adminPin: '',
     linhVatSessionCooldown: true,
     allowFreeCraneAnytime: true,
+    buffaloRace: {
+      enabled: true,
+      botCount: 5,
+      difficulty: 'trungbinh',
+      mapMode: 'random',
+      laps: 2,
+      autoSchedule: true,
+      intervalMin: 10,
+      ambientBots: true
+    },
     rewards: {
       incense: 5,
       sanIncense: 5,
@@ -537,10 +548,28 @@ function normalizeConfig(raw = {}) {
       }))
     : def.festival.steps;
 
+  const rawRace = raw.buffaloRace && typeof raw.buffaloRace === 'object' ? raw.buffaloRace : {};
+  const validRaceDiffs = ['de', 'trungbinh', 'kho', 'cuckho'];
+  const validMapModes = ['random', 'easy', 'medium', 'complex', 'extreme'];
+  const raceBotNum = Number(rawRace.botCount);
+  const raceLapsNum = Number(rawRace.laps);
+  const raceIntervalNum = Number(rawRace.intervalMin);
+  const buffaloRace = {
+    enabled: rawRace.enabled !== undefined ? Boolean(rawRace.enabled) : def.buffaloRace.enabled,
+    botCount: Number.isFinite(raceBotNum) ? Math.max(0, Math.min(16, Math.round(raceBotNum))) : def.buffaloRace.botCount,
+    difficulty: validRaceDiffs.includes(rawRace.difficulty) ? rawRace.difficulty : def.buffaloRace.difficulty,
+    mapMode: validMapModes.includes(rawRace.mapMode) ? rawRace.mapMode : def.buffaloRace.mapMode,
+    laps: Number.isFinite(raceLapsNum) ? Math.max(1, Math.min(5, Math.round(raceLapsNum))) : def.buffaloRace.laps,
+    autoSchedule: rawRace.autoSchedule !== undefined ? Boolean(rawRace.autoSchedule) : def.buffaloRace.autoSchedule,
+    intervalMin: Number.isFinite(raceIntervalNum) ? Math.max(1, Math.min(60, Math.round(raceIntervalNum))) : def.buffaloRace.intervalMin,
+    ambientBots: rawRace.ambientBots !== undefined ? Boolean(rawRace.ambientBots) : def.buffaloRace.ambientBots
+  };
+
   return {
     adminPin: typeof raw.adminPin === 'string' ? raw.adminPin.trim().slice(0, 64) : def.adminPin,
     linhVatSessionCooldown: raw.linhVatSessionCooldown !== undefined ? Boolean(raw.linhVatSessionCooldown) : def.linhVatSessionCooldown,
     allowFreeCraneAnytime: raw.allowFreeCraneAnytime !== undefined ? Boolean(raw.allowFreeCraneAnytime) : def.allowFreeCraneAnytime,
+    buffaloRace,
     rewards,
     questsConfig,
     festival: {
@@ -562,6 +591,23 @@ function normalizeConfig(raw = {}) {
 let gameConfig = normalizeConfig(readJsonSafe(CONFIG_FILE, {}));
 if (!fs.existsSync(CONFIG_FILE)) {
   writeJsonAtomic(CONFIG_FILE, gameConfig);
+}
+const raceSchedTracker = createRaceTracker(Date.now(), gameConfig.buffaloRace, TZ_OFFSET_MS);
+let raceManualOpenUntil = 0;
+
+function getCurrentRaceSlot(nowMs = Date.now()) {
+  return computeRaceSlot(nowMs, gameConfig.buffaloRace, TZ_OFFSET_MS, raceManualOpenUntil);
+}
+
+function broadcastRaceScheduleEvent(event, slot, minsLeft = 0) {
+  if (!event) return;
+  const text = event === 'start'
+    ? `🏁 Giải đua trâu quanh chùa (${slot.curLabel}) đã chính thức bắt đầu! Mời các thí chủ nhập cuộc hoặc xem bên trường đua!`
+    : `🐂 Cuộc đua trâu quanh chùa lúc ${slot.nextLabel} sắp bắt đầu sau ${minsLeft} phút!`;
+  for (const room of rooms.values()) {
+    room.broadcast({ t: 'ann', k: 'admin', text });
+    room.broadcast({ t: 'race-sched', phase: event, minsLeft, ...slot });
+  }
 }
 
 function saveConfig() {
@@ -737,8 +783,11 @@ class Player {
     this.s = 0;
     this.seat = null;
     this.flying = false;
+    this.dtMask = 0;
+    this.maOn = 0;
     this.lastSeen = Date.now();
     this.lastMoMeritAt = 0;
+    this.lastRaceAt = 0;
     this.giftsLeftToday = 5;
   }
 
@@ -801,7 +850,9 @@ class Player {
       z: this.z,
       ry: this.ry,
       s: this.s,
-      fly: this.flying ? 1 : 0
+      fly: this.flying ? 1 : 0,
+      dt: this.dtMask || 0,
+      ma: this.maOn || 0
     };
   }
 
@@ -1176,7 +1227,9 @@ function buildLinhVatPayload(rec) {
       w: ruaSes.w,
       bonded: ruaS >= 7,
       swim: ruaS >= 3
-    }
+    },
+    race: { ...gameConfig.buffaloRace },
+    raceSched: getCurrentRaceSlot(Date.now())
   };
 }
 
@@ -1534,6 +1587,7 @@ function buildAdminState() {
     meta: {
       currentVnTime,
       vnHour: getVnHour(),
+      raceSchedule: getCurrentRaceSlot(Date.now()),
       linhVatWindows: LINH_VAT_WINDOWS,
       linhVatSlotsNow: {
         trau: getLinhVatSlot('trau'),
@@ -1648,7 +1702,14 @@ const server = http.createServer(async (req, res) => {
         if (body.config?.festival) {
           merged.festival = { ...gameConfig.festival, ...body.config.festival };
         }
+        if (body.config?.buffaloRace) {
+          merged.buffaloRace = { ...gameConfig.buffaloRace, ...body.config.buffaloRace };
+        }
         gameConfig = normalizeConfig(merged);
+        const curS = computeRaceSlot(Date.now(), gameConfig.buffaloRace, TZ_OFFSET_MS);
+        raceSchedTracker.lastStartedSlot = curS.curSlot;
+        raceSchedTracker.lastWarnSlot = -1;
+        raceSchedTracker.lastWarnMin = 0;
       }
       saveConfig();
 
@@ -1915,6 +1976,18 @@ const server = http.createServer(async (req, res) => {
         r.lanterns = r.lanterns.filter((l) => l.id !== body.id);
         r.broadcast({ t: 'lantern-gone', id: body.id });
         flushSave();
+      } else if (action === 'trigger-race-now') {
+        const nowTs = Date.now();
+        raceManualOpenUntil = nowTs + RACE_JOIN_WINDOW_SEC * 1000;
+        const slot = getCurrentRaceSlot(nowTs);
+        raceSchedTracker.lastStartedSlot = slot.curSlot;
+        raceSchedTracker.lastWarnSlot = -1;
+        raceSchedTracker.lastWarnMin = 0;
+        broadcastRaceScheduleEvent('start', slot, 0);
+      } else if (action === 'trigger-race-warn') {
+        const minsLeft = Math.max(1, Math.min(3, Math.round(Number(body.minsLeft) || 3)));
+        const slot = getCurrentRaceSlot(Date.now());
+        broadcastRaceScheduleEvent('warn', slot, minsLeft);
       }
 
       sendJson(res, 200, { ok: true, state: buildAdminState() });
@@ -1958,7 +2031,7 @@ const server = http.createServer(async (req, res) => {
 
   fs.stat(filePath, (err, stats) => {
     if (err || !stats.isFile()) {
-      if (pathname.startsWith('/models/') || pathname.startsWith('/assets/') || pathname.startsWith('/draco/') || pathname.startsWith('/music/')) {
+      if (path.extname(pathname) || pathname.startsWith('/models/') || pathname.startsWith('/assets/') || pathname.startsWith('/draco/') || pathname.startsWith('/music/')) {
         res.writeHead(404, { 'Content-Type': 'text/plain' });
         res.end(`404 Not Found: ${pathname}`);
         return;
@@ -2262,6 +2335,12 @@ wss.on('connection', (ws, req) => {
 
       case 'emote': {
         if (!player.room || !msg.e) break;
+        if (typeof msg.e === 'string' && /^dt-[0-7]$/.test(msg.e)) {
+          player.dtMask = parseInt(msg.e.slice(3), 10) || 0;
+        }
+        if (msg.e === 'ma-1' || msg.e === 'ma-0') {
+          player.maOn = msg.e === 'ma-1' ? 1 : 0;
+        }
         if (msg.e === 'lay') {
           player.rec.bows += 1;
           player.advanceQuests(['lay', 'lay27', 'wLay', 'nmLay'], 1);
@@ -2835,6 +2914,7 @@ wss.on('connection', (ws, req) => {
       }
 
       case 'lv-cuoi': {
+        if (msg.on) player.maOn = 0;
         player.room?.broadcast({ t: 'lv-cuoi', id: player.id, on: msg.on ? 1 : 0 }, player.id);
         break;
       }
@@ -2847,6 +2927,7 @@ wss.on('connection', (ws, req) => {
       case 'lv-bay': {
         const on = (msg.on !== undefined ? Boolean(msg.on) : Boolean(msg.k)) ? 1 : 0;
         player.flying = Boolean(on);
+        if (on) player.maOn = 0;
         player.room?.broadcast({ t: 'lv-bay', id: player.id, on }, player.id);
         break;
       }
@@ -2854,6 +2935,29 @@ wss.on('connection', (ws, req) => {
       case 'lv-xuong': {
         player.flying = false;
         player.room?.broadcast({ t: 'lv-bay', id: player.id, on: 0 }, player.id);
+        break;
+      }
+
+      case 'duatrau-done': {
+        const nowTs = Date.now();
+        if (nowTs - player.lastRaceAt < 15000) break;
+        player.lastRaceAt = nowTs;
+        const rank = Math.max(1, Math.min(20, Math.round(Number(msg.rank) || 1)));
+        const total = Math.max(rank, Math.min(20, Math.round(Number(msg.total) || 1)));
+        const diffLabels = { de: 'Dễ', trungbinh: 'Trung Bình', kho: 'Khó', cuckho: 'Cực Khó' };
+        const diffMult = { de: 1, trungbinh: 1.5, kho: 2, cuckho: 3 };
+        const diff = diffLabels[msg.diff] ? msg.diff : 'trungbinh';
+        const mult = diffMult[diff];
+        const podium = rank === 1 ? 15 : rank === 2 ? 10 : rank === 3 ? 6 : 3;
+        const rewardPts = Math.round(podium * mult);
+        player.addMerit(rewardPts, `Đua trâu hạng ${rank}/${total} (${diffLabels[diff]})`);
+        if (rank === 1 && total >= 2) {
+          player.room?.broadcast({
+            t: 'ann',
+            k: 'admin',
+            text: `🐂 ${player.rec.name} vừa về Nhất Trường đua trâu quanh chùa (${diffLabels[diff]} · ${total} trâu)!`
+          });
+        }
         break;
       }
 
@@ -2929,8 +3033,13 @@ wss.on('connection', (ws, req) => {
   });
 });
 
-// Track meditation sitting duration (1s tick: s === 2 -> increment sitSec, +1 sitMin & merit per 60s)
+// Track meditation sitting duration + 10-minute buffalo race schedule & 3p/2p/1p announcements
 setInterval(() => {
+  const nowMs = Date.now();
+  const raceTick = evaluateRaceTick(raceSchedTracker, nowMs, gameConfig.buffaloRace, TZ_OFFSET_MS);
+  if (raceTick.event) {
+    broadcastRaceScheduleEvent(raceTick.event, raceTick.slot, raceTick.minsLeft);
+  }
   for (const player of allPlayers.values()) {
     if (player.s === 2) {
       player.rec.sitSec += 1;

@@ -40,6 +40,20 @@ const FEST_STEP_KINDS = [
   { id: 'sitMin', label: 'Ngồi thiền (phút)' }
 ];
 
+const RACE_DIFF_LABELS = {
+  de: 'Dễ',
+  trungbinh: 'Trung Bình',
+  kho: 'Khó',
+  cuckho: 'Cực Khó'
+};
+const RACE_MAP_LABELS = {
+  random: 'Ngẫu nhiên',
+  easy: 'Dễ',
+  medium: 'Uốn lượn',
+  complex: 'Phức tạp',
+  extreme: 'Siêu xoắn'
+};
+
 let appState = null;
 let adminPin = localStorage.getItem('chua_admin_pin') || '';
 let activeTab = 'overview';
@@ -109,6 +123,15 @@ function renderAll(resetInputs = false) {
   if (resetInputs) {
     $('#lvCooldownToggle').checked = Boolean(config.linhVatSessionCooldown);
     $('#freeCraneToggle').checked = Boolean(config.allowFreeCraneAnytime);
+    const rc = config.buffaloRace || { enabled: true, botCount: 5, difficulty: 'trungbinh', mapMode: 'random', laps: 2, autoSchedule: true, intervalMin: 10, ambientBots: true };
+    $('#raceEnabledToggle').checked = rc.enabled !== false;
+    $('#raceBotCountInput').value = rc.botCount ?? 5;
+    $('#raceDifficultySelect').value = RACE_DIFF_LABELS[rc.difficulty] ? rc.difficulty : 'trungbinh';
+    $('#raceMapModeSelect').value = RACE_MAP_LABELS[rc.mapMode] ? rc.mapMode : 'random';
+    $('#raceLapsInput').value = rc.laps ?? 2;
+    $('#raceIntervalMinInput').value = rc.intervalMin ?? 10;
+    $('#raceAutoScheduleToggle').checked = rc.autoSchedule !== false;
+    $('#raceAmbientBotsToggle').checked = rc.ambientBots !== false;
     renderFestivalForm();
     renderRewardsGrid();
   }
@@ -127,13 +150,24 @@ function renderAll(resetInputs = false) {
 function renderOverviewStats() {
   const { onlineCount, totalCharacters, rooms, quiz, config } = appState;
   const mainRoom = rooms[0] || { incense: 0, yardIncense: 0, lamps: 0 };
+  const rc = config.buffaloRace || { enabled: true, botCount: 5, difficulty: 'trungbinh', laps: 2, intervalMin: 10, autoSchedule: true, ambientBots: true };
+  const rs = appState.meta?.raceSchedule;
+  const rsEl = $('#raceSchedMeta');
+  if (rsEl) {
+    if (!rc.enabled) rsEl.textContent = 'Trường đua đang tắt.';
+    else if (!rc.autoSchedule) rsEl.textContent = 'Tự mở giải định kỳ đang tắt (Bot vẫn có thể chạy tự do).';
+    else if (rs) {
+      const m = Math.floor(rs.remSec / 60), s = rs.remSec % 60;
+      rsEl.textContent = `Giải định kỳ kế tiếp: ${rs.nextLabel} (còn ${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}) · Nhắc toàn chùa lúc 3p / 2p / 1p.`;
+    }
+  }
   $('#overviewStats').innerHTML = `
     <div class="stat-box"><div class="label">Người đang online</div><div class="val">${onlineCount}</div></div>
     <div class="stat-box"><div class="label">Tổng nhân vật lưu</div><div class="val">${totalCharacters}</div></div>
     <div class="stat-box"><div class="label">Hương điện / sân / đèn</div><div class="val">${mainRoom.incense} · ${mainRoom.yardIncense} · ${mainRoom.lamps}</div></div>
     <div class="stat-box"><div class="label">Chia giờ Linh Vật</div><div class="val">${config.linhVatSessionCooldown ? 'Theo Sáng/Chiều' : 'Tự do 24/7'}</div></div>
-    <div class="stat-box"><div class="label">Lễ hội hiện tại</div><div class="val">${config.festival.enabled ? esc(config.festival.id) : 'Đang tắt'}</div></div>
-    <div class="stat-box"><div class="label">Đố vui Phật pháp</div><div class="val">${esc(quiz.phase)}</div></div>
+    <div class="stat-box"><div class="label">Đường đua trâu</div><div class="val">${rc.enabled === false ? 'Đang tắt' : `${rc.botCount ?? 5} bot · ${RACE_DIFF_LABELS[rc.difficulty] || 'Trung Bình'} · ${rc.intervalMin || 10}p`}</div></div>
+    <div class="stat-box"><div class="label">Lễ hội / Đố vui</div><div class="val">${config.festival.enabled ? esc(config.festival.id) : 'Tắt'} · ${esc(quiz.phase)}</div></div>
   `;
 }
 
@@ -643,6 +677,42 @@ $('#saveLvCooldownBtn').addEventListener('click', async () => {
     appState = res.state;
     renderAll(true);
     showToast('Đã lưu chế độ Linh Vật & Cưỡi hạc.');
+  } catch (err) { showToast(err.message, true); }
+});
+
+$('#saveRaceConfigBtn').addEventListener('click', async () => {
+  const botCount = Math.max(0, Math.min(16, Math.round(Number($('#raceBotCountInput').value) || 0)));
+  const difficulty = $('#raceDifficultySelect').value || 'trungbinh';
+  const mapMode = $('#raceMapModeSelect').value || 'random';
+  const laps = Math.max(1, Math.min(5, Math.round(Number($('#raceLapsInput').value) || 2)));
+  const intervalMin = Math.max(1, Math.min(60, Math.round(Number($('#raceIntervalMinInput').value) || 10)));
+  const enabled = $('#raceEnabledToggle').checked;
+  const autoSchedule = $('#raceAutoScheduleToggle').checked;
+  const ambientBots = $('#raceAmbientBotsToggle').checked;
+  try {
+    const res = await api('/api/admin/config', {
+      method: 'POST',
+      body: JSON.stringify({
+        config: {
+          buffaloRace: { enabled, botCount, difficulty, mapMode, laps, autoSchedule, intervalMin, ambientBots }
+        }
+      })
+    });
+    appState = res.state;
+    renderAll(true);
+    showToast(`Đã lưu Đua trâu: ${botCount} bot · ${RACE_DIFF_LABELS[difficulty] || difficulty} · Chu kỳ ${intervalMin}p.`);
+  } catch (err) { showToast(err.message, true); }
+});
+
+$('#triggerRaceNowBtn')?.addEventListener('click', async () => {
+  try {
+    const res = await api('/api/admin/world', {
+      method: 'POST',
+      body: JSON.stringify({ room: 'all', action: 'trigger-race-now' })
+    });
+    appState = res.state;
+    renderAll(false);
+    showToast('Đã phát động giải đua trâu toàn chùa!');
   } catch (err) { showToast(err.message, true); }
 });
 

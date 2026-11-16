@@ -114,6 +114,67 @@
         </div>
       </div>
 
+      <div class="card" style="margin-top:16px;">
+        <div class="card-head">
+          <h2>🏁 Trường Đua Trâu Quanh Chùa (Bot AI)</h2>
+          <label class="switch">
+            <input type="checkbox" id="raceEnabledToggle" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <p class="muted" style="margin-bottom:10px;">
+          Cấu hình đường đua trâu bao quanh chùa: số lượng bot, độ khó AI (Dễ / Trung Bình / Khó / Cực Khó), loại bản đồ (ngẫu nhiên hoặc từ dễ đến quanh cua phức tạp) và số vòng đua.
+        </p>
+        <div class="grid-2 compact">
+          <div class="form-group">
+            <label>Số lượng Bot khi tham gia (0–16)</label>
+            <input id="raceBotCountInput" type="number" min="0" max="16" value="5" />
+          </div>
+          <div class="form-group">
+            <label>Chế độ độ khó Bot</label>
+            <select id="raceDifficultySelect">
+              <option value="de">Dễ</option>
+              <option value="trungbinh">Trung Bình</option>
+              <option value="kho">Khó</option>
+              <option value="cuckho">Cực Khó</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Loại bản đồ đường đua</label>
+            <select id="raceMapModeSelect">
+              <option value="random">Ngẫu nhiên (từ Dễ tới Phức tạp)</option>
+              <option value="easy">Dễ · Bầu dục êm</option>
+              <option value="medium">Trung Bình · Uốn lượn chữ S</option>
+              <option value="complex">Phức tạp · Nhiều khúc cua gắt</option>
+              <option value="extreme">Siêu xoắn · Cua liên hoàn</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Số vòng đua (1–5)</label>
+            <input id="raceLapsInput" type="number" min="1" max="5" value="2" />
+          </div>
+          <div class="form-group">
+            <label>Chu kỳ mở giải tự động (phút, mặc định 10)</label>
+            <input id="raceIntervalMinInput" type="number" min="1" max="60" value="10" />
+          </div>
+        </div>
+        <div class="row gap" style="justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);flex-wrap:wrap;">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="raceAutoScheduleToggle" checked />
+            <span>Tự mở giải định kỳ &amp; nhắc trước 3p / 2p / 1p</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="raceAmbientBotsToggle" checked />
+            <span>Bot tự đua quanh chùa liên tục tạo không khí</span>
+          </label>
+        </div>
+        <div class="muted" id="raceSchedMeta" style="margin-top:8px;">Giải kế tiếp: --</div>
+        <div class="row gap" style="margin-top:10px;">
+          <button id="saveRaceConfigBtn" class="btn primary">Lưu cấu hình Đua Trâu</button>
+          <button id="triggerRaceNowBtn" class="btn gold" type="button">🏁 Mở giải đua ngay</button>
+        </div>
+      </div>
+
       <div class="grid-2" style="margin-top:16px;">
         <div class="card">
           <div class="card-head">
