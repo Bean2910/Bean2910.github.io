@@ -107,6 +107,14 @@ try {
   assert.deepEqual(passRes, { off: true });
   const htmlRes = await fetch(`http://127.0.0.1:${PORT}/`);
   assert.equal(htmlRes.status, 200);
+  assert.equal(htmlRes.headers.get('cache-control'), 'no-cache');
+  const htmlText = await htmlRes.text();
+  assert.ok(htmlText.includes('main-CPNz0KLo.js?v=2026111609'));
+  const jsRes = await fetch(`http://127.0.0.1:${PORT}/assets/main-CPNz0KLo.js?v=2026111609`);
+  assert.equal(jsRes.status, 200);
+  assert.equal(jsRes.headers.get('cache-control'), 'no-cache');
+  const jsText = await jsRes.text();
+  assert.ok(jsText.includes('freeLook'));
   const adminHtmlRes = await fetch(`http://127.0.0.1:${PORT}/admin`);
   assert.equal(adminHtmlRes.status, 200);
   assert.ok((await adminHtmlRes.text()).includes('Quản Trị Chùa'));

@@ -1969,7 +1969,7 @@ const server = http.createServer(async (req, res) => {
           res.writeHead(404, { 'Content-Type': 'text/plain' });
           res.end('404 Not Found');
         } else {
-          res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+          res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache' });
           res.end(data);
         }
       });
@@ -1996,7 +1996,7 @@ const server = http.createServer(async (req, res) => {
     res.writeHead(200, {
       'Content-Length': stats.size,
       'Content-Type': contentType,
-      'Cache-Control': ext === '.html' ? 'no-cache' : 'public, max-age=86400'
+      'Cache-Control': (ext === '.html' || ext === '.js' || ext === '.css' || pathname.includes('tien_kiem')) ? 'no-cache' : 'public, max-age=86400'
     });
     fs.createReadStream(filePath).pipe(res);
   });
