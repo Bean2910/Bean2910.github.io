@@ -5255,19 +5255,20 @@ const YtFx=(()=>{
   const ring=new N(new pe(SW+1.8,4.6).rotateX(-Math.PI/2),new Xt({map:pC(),color:"#fff0c4",transparent:!0,depthWrite:!1,toneMapped:!1,opacity:.42}));
   ring.position.set(0,.02,.85);group.add(ring);
   const sign=new pa(new Bo({map:_pillTex(),transparent:!0,depthWrite:!1,toneMapped:!1}));
-  sign.scale.set(4.2,.66,1);sign.position.y=BASE_H+SH+1.05;group.add(sign);
+  sign.scale.set(4.2,.66,1);sign.position.y=BASE_H+SH+.96;group.add(sign);
   const hitH=BASE_H+SH+.8,hit=new N(new wt(SW+1.1,hitH,1.4),new Xt({visible:!1}));
   hit.position.set(0,hitH/2,.25);group.add(hit);
   Se(X,Z,SW+1.35,1.25);
 
-  // Quả cầu gương Disco 7 sắc cầu vồng Gradient treo phía trên-trước màn chiếu 16:9 (0, 6.22, 2.35)
+  // Quả cầu gương Disco 7 sắc cầu vồng Gradient treo giữa sân nệm ngồi (0, 6.50, 5.4)
   let discoOn=!1,discoMix=0,lastAnimT=0;
-  const Z_BALL=2.35,Y_BALL=6.22,R_BALL=.62;
-  put(new wt(.14,.12,2.55),dSt,-.95,6.84,1.28);
-  put(new wt(.14,.12,2.55),dSt,.95,6.84,1.28);
-  put(new wt(2.15,.12,.14),goldM,0,6.84,Z_BALL);
-  put(new q(.24,.28,.22,16),dSt,0,6.76,Z_BALL);
-  put(new q(.04,.04,.38,8),goldM,0,6.54,Z_BALL);
+  const Z_BALL=5.4,Y_BALL=6.50,R_BALL=.62;
+  put(new wt(.10,.10,Z_BALL+.3),dSt,-.72,7.12,(Z_BALL+.15)/2);
+  put(new wt(.10,.10,Z_BALL+.3),dSt,.72,7.12,(Z_BALL+.15)/2);
+  for(const xb of [-.72,.72]){const stB=put(new wt(.09,.09,2.1),dSt,xb,6.55,.95);stB.rotation.x=-.62}
+  for(const zb of [2.0,3.8,Z_BALL])put(new wt(1.62,.10,.10),goldM,0,7.12,zb);
+  put(new q(.24,.28,.22,16),dSt,0,7.04,Z_BALL);
+  put(new q(.04,.04,.40,8),goldM,0,6.82,Z_BALL);
   function _mkMirrorTex(){
     const cv=document.createElement("canvas");cv.width=512;cv.height=256;
     const g=cv.getContext("2d");
@@ -5313,13 +5314,13 @@ const YtFx=(()=>{
   discoHit.position.set(0,Y_BALL,Z_BALL);group.add(discoHit);
   const discoPivot=new D;ballRoot.add(discoPivot);
   const RB_BEAM_VS="varying vec2 vUv;varying vec3 vWPos;varying vec3 vWNrm;void main(){vUv=uv;vec4 wp=modelMatrix*vec4(position,1.0);vWPos=wp.xyz;vWNrm=normalize(mat3(modelMatrix)*normal);gl_Position=projectionMatrix*viewMatrix*wp;}";
-  const RB_BEAM_FS="uniform float uTime;uniform float uMix;uniform float uPhase;varying vec2 vUv;varying vec3 vWPos;varying vec3 vWNrm;"+HSV_FN+"void main(){float hue=fract(uPhase+(1.0-vUv.y)*0.78+vUv.x*0.45-uTime*0.36);vec3 rb=hsv2rgb(vec3(hue,0.92,1.0));float fadeLen=smoothstep(0.0,0.42,vUv.y)*smoothstep(1.0,0.88,vUv.y);vec3 vdir=normalize(cameraPosition-vWPos);float edge=pow(abs(dot(normalize(vWNrm),vdir)),1.15);float al=uMix*fadeLen*edge*0.30;if(al<0.004)discard;gl_FragColor=vec4(rb,al);}";
+  const RB_BEAM_FS="uniform float uTime;uniform float uMix;uniform float uPhase;varying vec2 vUv;varying vec3 vWPos;varying vec3 vWNrm;"+HSV_FN+"void main(){float hue=fract(uPhase+(1.0-vUv.y)*0.78+vUv.x*0.45-uTime*0.36);vec3 rb=hsv2rgb(vec3(hue,0.92,1.0));float fadeLen=smoothstep(0.0,0.42,vUv.y)*smoothstep(1.0,0.88,vUv.y);float floorCut=smoothstep(0.02,0.42,vWPos.y);float frontCut=smoothstep(29.2,30.8,vWPos.z);vec3 vdir=normalize(cameraPosition-vWPos);float edge=pow(abs(dot(normalize(vWNrm),vdir)),1.15);float al=uMix*fadeLen*floorCut*frontCut*edge*0.30;if(al<0.004)discard;gl_FragColor=vec4(rb,al);}";
   const beamUniforms=[];
   for(let idx=0;idx<10;idx++){
-    const arm=new D;arm.rotation.y=(idx/10)*Math.PI*2;arm.rotation.x=.42+(idx%3)*.22;
+    const arm=new D;arm.rotation.y=(idx/10)*Math.PI*2;arm.rotation.x=.26+(idx%3)*.14;
     const bu={uTime:{value:0},uMix:{value:0},uPhase:{value:idx/10}};
     const bmMat=typeof qs<"u"?new qs({uniforms:bu,vertexShader:RB_BEAM_VS,fragmentShader:RB_BEAM_FS,transparent:!0,depthWrite:!1,blending:bs,side:ae}):new Xt({color:"#a855f7",transparent:!0,opacity:0,depthWrite:!1,blending:bs,side:ae});
-    const cone=new N(new Ve(1.48,9.4,16,1,!0),bmMat);cone.position.y=-4.7;arm.add(cone);discoPivot.add(arm);
+    const cone=new N(new Ve(1.22,6.9,16,1,!0),bmMat);cone.position.y=-3.45;arm.add(cone);discoPivot.add(arm);
     beamUniforms.push({u:bu,mat:bmMat,idx});
   }
   const N_DOTS=144,fleckTex=_mkFleckTex(),dotGeo=new pe(.32,.22),dotMat=new Xt({map:fleckTex,transparent:!0,opacity:.92,depthWrite:!1,blending:bs,side:ae});
@@ -5334,7 +5335,7 @@ const YtFx=(()=>{
   const discoLight=typeof ur<"u"?new ur("#a855f7",0,22,1.35):null;
   discoLight&&(discoLight.position.set(0,5.9,Z_BALL),group.add(discoLight));
   const discoLight2=typeof ur<"u"?new ur("#38bdf8",0,18,1.35):null;
-  discoLight2&&(discoLight2.position.set(0,3.2,5.8),group.add(discoLight2));
+  discoLight2&&(discoLight2.position.set(0,3.6,Z_BALL+1.2),group.add(discoLight2));
 
   // 28 nệm ngồi như Chánh Điện đặt trước màn hình 16:9 (4 hàng x 7 cột, facing screen -Z / Math.PI)
   const seats=[];
@@ -5547,7 +5548,7 @@ const YtFx=(()=>{
   function onSn(){viewMode==="modal"&&setMode(state.current?"world":"closed")}
   function update(t){
     const dt=lastAnimT?Math.min(.05,Math.max(.001,t-lastAnimT)):.016;lastAnimT=t;
-    const e=.5+.5*Math.sin(t*2);ring.material.opacity=.3+.25*e;sign.position.y=BASE_H+SH+1.05+.04*Math.sin(t*1.5);
+    const e=.5+.5*Math.sin(t*2);ring.material.opacity=.3+.25*e;sign.position.y=BASE_H+SH+.96+.04*Math.sin(t*1.5);
     discoMix+=((discoOn?1:0)-discoMix)*Math.min(1,dt*4.2);
     discoBall.rotation.y+=dt*(.28+discoMix*1.25);
     ballRoot.rotation.z=discoMix>0?Math.sin(t*1.5)*.06*discoMix:0;
@@ -5571,12 +5572,12 @@ const YtFx=(()=>{
       for(let k=0;k<N_DOTS;k++){
         const sp=dotSpecs[k],a=sp.ang+t*sp.spd;
         if(sp.isFloor){
-          const px=Math.cos(a)*sp.rad,pz=6.2+Math.sin(a)*(sp.rad*.88);
+          const px=Math.cos(a)*sp.rad,pz=Math.max(1.2,Z_BALL+1.0+Math.sin(a)*(sp.rad*.82));
           _dPos.set(px,.04,pz);
           _dQuat.setFromAxisAngle(new x(1,0,0),-Math.PI/2);
           _dSc.setScalar((.85+.35*Math.sin(t*5+sp.ph))*discoMix);
         }else{
-          const px=Math.cos(a)*sp.rad,py=Math.max(.55,Y_BALL-Math.sin(sp.elev)*sp.rad*1.15),pz=Z_BALL+Math.sin(a)*sp.rad*.75;
+          const px=Math.cos(a)*sp.rad,py=Math.max(.55,Y_BALL-Math.sin(sp.elev)*sp.rad*1.05),pz=Math.max(1.2,Z_BALL+Math.sin(a)*sp.rad*.68);
           _dPos.set(px,py,pz);
           _dirV.set(px,py-Y_BALL,pz-Z_BALL).normalize();
           _dQuat.setFromUnitVectors(_upV,_dirV);

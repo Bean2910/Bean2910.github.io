@@ -2,7 +2,7 @@
 
 > **Thời điểm cập nhật:** `2026-11-18`  
 > **Repository:** `https://github.com/Bean2910/didenchua.git` (`main`)  
-> **Phiên bản client hiện hành:** `index.html` (`?v=2026111804`) · Đã đẩy code lên `origin/main`  
+> **Phiên bản client hiện hành:** `index.html` (`?v=2026111805`) · Đã đẩy code lên `origin/main`  
 > **Trạng thái tổng quan:** Toàn bộ Backend Node.js (`3.287` dòng), Frontend 3D Three.js (`client/assets/main-CPNz0KLo.js`), Trang quản trị `/admin`, và bộ kiểm thử E2E (`server/tests/verify_server.mjs`, `636` dòng) đã hoàn thiện và kiểm thử vượt qua toàn bộ.
 
 ---
@@ -27,7 +27,7 @@ didenchua/
 │   │   ├── sa_ngo_tinh.glb              # Đệ tử Sa Ngộ Tĩnh
 │   │   └── ... (39 model gốc của chùa: trau_*, rua_*, phap khi, linh vat, hoa sen...)
 │   ├── music/                           # Nhạc nền Chánh điện & kinh tụng (.mp3)
-│   ├── index.html                       # Đã gỡ Cloudflare telemetry · cache tag ?v=2026111804
+│   ├── index.html                       # Đã gỡ Cloudflare telemetry · cache tag ?v=2026111805
 │   └── package.json / vite.config.js
 │
 ├── server/                              # Backend Node.js + WebSocket (ws) + Admin GUI
@@ -121,7 +121,7 @@ didenchua/
   - Khung màn hình rộng chuẩn **`8.0m × 4.5m` (16:9)** nâng cao `1.10m`, chiếu video YouTube (`<iframe>`) **trực tiếp lên mặt bảng 3D ngoài sân chùa** theo góc nhìn camera thực qua CSS3D `sync3D(Pe)` (tự ẩn mặt lưng khi đứng sau bảng hoặc khi vào trong Chánh điện).
   - Bảng điều khiển hỗ trợ dán link YouTube, **Phát ngay lên bảng**, **Thêm hàng chờ**, **Bài tiếp**, **Dừng phát**, **Thu nhỏ PiP** (không bị tải lại iframe khi chuyển giữa `world` ↔ `modal` ↔ `pip`).
 - **Quả cầu gương Disco 7 sắc cầu vồng Gradient (`yt-disco`):**
-  - Treo trên giàn truss trước màn chiếu (`(16.2, 6.22, 30.85)`), phủ texture mosaic `36×18` ô kính + shader cầu vồng lấp lánh, **10 luồng tia ánh sáng gradient 7 sắc**, **144 đốm sáng phản chiếu (`InstancedMesh`)** xoay dưới sân & không gian xung quanh, cùng 2 `PointLight` đổi màu cầu vồng. Bật/tắt qua click trực tiếp quả cầu, nút HUD **`Quả cầu gương`**, hoặc trong modal YouTube.
+  - Treo trên giàn truss trước màn chiếu (`(16.2, 6.50, 33.9)`), phủ texture mosaic `36×18` ô kính + shader cầu vồng lấp lánh, **10 luồng tia ánh sáng gradient 7 sắc**, **144 đốm sáng phản chiếu (`InstancedMesh`)** xoay dưới sân & không gian xung quanh, cùng 2 `PointLight` đổi màu cầu vồng. Bật/tắt qua click trực tiếp quả cầu, nút HUD **`Quả cầu gương`**, hoặc trong modal YouTube.
 - **28 nệm ngồi kiểu Chánh Điện (`cd-yt-0..cd-yt-27`):**
   - Xếp **4 hàng × 7 cột** ngay trước màn chiếu (`x = 11.4..21.0`, `z = 31.7..38.0`), click tới ngồi hướng mặt vào màn hình (`facing = Math.PI`), tính phút tĩnh tọa `sitMin`.
 - **7 Bot thiện tín (`BotFx`):**
@@ -133,7 +133,7 @@ didenchua/
 
 - **Cơ chế cập nhật `client/assets/main-CPNz0KLo.js`:**
   - Frontend sử dụng bản build bundle đã minify; mọi nâng cấp JS/CSS từ ngày 16–18/11 đều được áp dụng có kiểm soát thông qua script Node `replaceExact(...)` (lưu bản gốc tham chiếu tại thư mục scratch của phiên làm việc) kèm audit `'use strict'` để đảm bảo không trùng biến cục bộ minify (ví dụ tránh tên trùng như `Yc`, ưu tiên tiền tố module riêng `VkFx`, `DtFx`, `HmFx`, `MobFx`, `YtFx`, `BotFx`, `RaceSys`).
-  - Mỗi lần sửa bundle client cần tăng query cache-bust trong [client/index.html](file:///D:/python/didenchua/client/index.html) (hiện tại `?v=2026111804`) và cập nhật khớp trong `server/tests/verify_server.mjs`, sau đó nhắc người chơi nhấn **`Ctrl + F5`**.
+  - Mỗi lần sửa bundle client cần tăng query cache-bust trong [client/index.html](file:///D:/python/didenchua/client/index.html) (hiện tại `?v=2026111805`) và cập nhật khớp trong `server/tests/verify_server.mjs`, sau đó nhắc người chơi nhấn **`Ctrl + F5`**.
 
 ---
 

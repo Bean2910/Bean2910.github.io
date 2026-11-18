@@ -141,8 +141,8 @@ try {
   assert.equal(htmlRes.headers.get('cache-control'), 'no-cache');
   assert.equal((await fetch(`http://127.0.0.1:${PORT}/sw.js`)).status, 404);
   const htmlText = await htmlRes.text();
-  assert.ok(htmlText.includes('main-CPNz0KLo.js?v=2026111804'));
-  const jsRes = await fetch(`http://127.0.0.1:${PORT}/assets/main-CPNz0KLo.js?v=2026111804`);
+  assert.ok(htmlText.includes('main-CPNz0KLo.js?v=2026111805'));
+  const jsRes = await fetch(`http://127.0.0.1:${PORT}/assets/main-CPNz0KLo.js?v=2026111805`);
   assert.equal(jsRes.status, 200);
   assert.equal(jsRes.headers.get('cache-control'), 'no-cache');
   const jsText = await jsRes.text();
