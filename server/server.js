@@ -788,6 +788,7 @@ class Player {
     this.lastSeen = Date.now();
     this.lastMoMeritAt = 0;
     this.lastRaceAt = 0;
+    this.lastYtAt = 0;
     this.giftsLeftToday = 5;
   }
 
@@ -1044,11 +1045,65 @@ class Player {
   }
 }
 
+const MOB_REWARDS = {
+  imp_sw: { tier: 1, label: 'Tiểu Yêu Hắc Phong', pts: 5, cool: 12000 },
+  imp_se: { tier: 1, label: 'Tiểu Yêu Hắc Phong', pts: 5, cool: 12000 },
+  imp_w: { tier: 1, label: 'Tiểu Yêu Rừng Tây', pts: 5, cool: 12000 },
+  imp_e: { tier: 1, label: 'Tiểu Yêu Đông Viên', pts: 5, cool: 12000 },
+  beast_sw: { tier: 2, label: 'Yêu Lang Hộ Cổng', pts: 10, cool: 18000 },
+  beast_se: { tier: 2, label: 'Yêu Lang Hộ Cổng', pts: 10, cool: 18000 },
+  beast_w: { tier: 2, label: 'Yêu Thú Tây Viên', pts: 10, cool: 18000 },
+  boss_nw: { tier: 3, label: 'Ma Tướng Tây Sơn', pts: 20, cool: 28000 },
+  boss_ne: { tier: 3, label: 'Ma Tướng Đông Hải', pts: 20, cool: 28000 }
+};
+
+function parseYoutubeId(raw) {
+  const s = String(raw || '').trim();
+  if (!s) return null;
+  if (/^[A-Za-z0-9_-]{11}$/.test(s)) return s;
+  const m = s.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|live\/|embed\/|v\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+
+function normalizeYtItem(item) {
+  if (!item || typeof item !== 'object') return null;
+  const vid = parseYoutubeId(item.videoId || item.url);
+  if (!vid) return null;
+  return {
+    id: sanitizeText(String(item.id || ''), 32) || (Date.now().toString(36) + Math.random().toString(36).slice(2, 6)),
+    videoId: vid,
+    title: sanitizeText(String(item.title || ''), 80) || `Nhạc YouTube (${vid})`,
+    by: sanitizeText(String(item.by || 'Khách chùa'), 40) || 'Khách chùa',
+    pid: sanitizeText(String(item.pid || ''), 32),
+    startedAt: Number.isFinite(Number(item.startedAt)) ? Number(item.startedAt) : Date.now(),
+    addedAt: Number.isFinite(Number(item.addedAt)) ? Number(item.addedAt) : Date.now()
+  };
+}
+
+function normalizeYtState(saved = {}) {
+  const raw = saved && typeof saved === 'object' ? saved : {};
+  const current = normalizeYtItem(raw.current);
+  const queue = Array.isArray(raw.queue) ? raw.queue.map(normalizeYtItem).filter(Boolean).slice(0, 25) : [];
+  return { current, queue, disco: Boolean(raw.disco) };
+}
+
+function buildYtPayload(room) {
+  const yt = room?.yt || { current: null, queue: [], disco: false };
+  return {
+    t: 'yt-state',
+    current: yt.current,
+    queue: yt.queue,
+    disco: Boolean(yt.disco),
+    now: Date.now()
+  };
+}
+
 class Room {
   constructor(name, saved = {}) {
     this.name = name;
     this.players = new Map();
     this.seats = new Map();
+    this.mobLastKill = new Map();
     this.incense = Number.isFinite(saved.incense) ? saved.incense : 0;
     this.yardIncense = Number.isFinite(saved.yardIncense) ? saved.yardIncense : 0;
     this.sideIncense = saved.sideIncense || { ong: 0, hien: 0 };
@@ -1057,6 +1112,7 @@ class Room {
     this.vows = Array.isArray(saved.vows) ? saved.vows : [];
     this.pinned = typeof saved.pinned === 'string' ? saved.pinned : '';
     this.donors = Array.isArray(saved.donors) ? saved.donors : [];
+    this.yt = normalizeYtState(saved.yt);
   }
 
   toJSON() {
@@ -1068,7 +1124,8 @@ class Room {
       lanterns: this.lanterns.slice(-30),
       vows: this.vows.slice(-30),
       pinned: this.pinned,
-      donors: this.donors.slice(-20)
+      donors: this.donors.slice(-20),
+      yt: this.yt
     };
   }
 
@@ -1428,7 +1485,8 @@ function sendWelcomeState(player, isNew) {
     total: allPlayers.size,
     hb: true,
     chores: player.rec.chores,
-    donors: room.donors
+    donors: room.donors,
+    yt: buildYtPayload(room)
   });
 
   player.send({ t: 'merit', me: player.getMeritData() });
@@ -1988,6 +2046,12 @@ const server = http.createServer(async (req, res) => {
         const minsLeft = Math.max(1, Math.min(3, Math.round(Number(body.minsLeft) || 3)));
         const slot = getCurrentRaceSlot(Date.now());
         broadcastRaceScheduleEvent('warn', slot, minsLeft);
+      } else if (action === 'clear-yt') {
+        for (const r of targetRooms) {
+          r.yt = { current: null, queue: [], disco: false };
+          r.broadcast(buildYtPayload(r));
+        }
+        flushSave();
       }
 
       sendJson(res, 200, { ok: true, state: buildAdminState() });
@@ -2628,7 +2692,9 @@ wss.on('connection', (ws, req) => {
           t: 'room',
           room: nextRoom.name,
           peers: nextRoom.getPeersList(player.id),
-          seats: Array.from(nextRoom.seats.entries())
+          seats: Array.from(nextRoom.seats.entries()),
+          donors: nextRoom.donors,
+          yt: buildYtPayload(nextRoom)
         });
         nextRoom.broadcast({ t: 'join', peer: player.toPeerObject() }, player.id);
         break;
@@ -2958,6 +3024,138 @@ wss.on('connection', (ws, req) => {
             text: `🐂 ${player.rec.name} vừa về Nhất Trường đua trâu quanh chùa (${diffLabels[diff]} · ${total} trâu)!`
           });
         }
+        break;
+      }
+
+      case 'mob-kill': {
+        const room = player.room;
+        if (!room || !msg.id) break;
+        const mob = MOB_REWARDS[msg.id];
+        if (!mob) break;
+        const nowTs = Date.now();
+        const prev = room.mobLastKill.get(msg.id) || 0;
+        if (nowTs - prev < mob.cool) break;
+        room.mobLastKill.set(msg.id, nowTs);
+        player.addMerit(mob.pts, `Hóa giải ${mob.label}`);
+        if (mob.tier >= 3) {
+          room.broadcast({
+            t: 'ann',
+            k: 'admin',
+            text: `⚔️ ${player.rec.name} vừa dùng thần thông hóa giải ${mob.label} (+${mob.pts} Công đức)!`
+          });
+        }
+        break;
+      }
+
+      case 'yt-add': {
+        const room = player.room;
+        if (!room) break;
+        const nowTs = Date.now();
+        if (nowTs - player.lastYtAt < 1200) break;
+        const vid = parseYoutubeId(msg.videoId || msg.url);
+        if (!vid) {
+          player.send({ t: 'notice', text: 'Link YouTube không hợp lệ' });
+          break;
+        }
+        player.lastYtAt = nowTs;
+        const item = {
+          id: nowTs.toString(36) + Math.random().toString(36).slice(2, 6),
+          videoId: vid,
+          title: sanitizeText(String(msg.title || ''), 80) || `Nhạc YouTube (${vid})`,
+          by: player.rec.name,
+          pid: player.rec.pid,
+          startedAt: nowTs,
+          addedAt: nowTs
+        };
+        const playNow = !room.yt.current || !!msg.playNow;
+        if (playNow) {
+          if (room.yt.current) {
+            room.yt.queue.unshift({ ...room.yt.current });
+          }
+          room.yt.current = item;
+        } else {
+          room.yt.queue.push(item);
+        }
+        room.yt.queue = room.yt.queue.slice(0, 25);
+        scheduleSave();
+        room.broadcast(buildYtPayload(room));
+        room.broadcast({
+          t: 'ann',
+          k: 'yt',
+          text: playNow
+            ? `🎵 ${player.rec.name} đang phát chiếu "${item.title}" trên Bảng nhạc YouTube sân chùa!`
+            : `🎵 ${player.rec.name} đã thêm "${item.title}" vào hàng chờ Bảng nhạc YouTube!`
+        });
+        break;
+      }
+
+      case 'yt-play': {
+        const room = player.room;
+        if (!room || !msg.id) break;
+        const nowTs = Date.now();
+        if (nowTs - player.lastYtAt < 1000) break;
+        player.lastYtAt = nowTs;
+        const idx = room.yt.queue.findIndex((x) => x.id === msg.id);
+        if (idx >= 0) {
+          const picked = room.yt.queue.splice(idx, 1)[0];
+          if (room.yt.current) room.yt.queue.push({ ...room.yt.current });
+          room.yt.current = { ...picked, startedAt: nowTs };
+          room.yt.queue = room.yt.queue.slice(0, 25);
+          scheduleSave();
+          room.broadcast(buildYtPayload(room));
+        }
+        break;
+      }
+
+      case 'yt-next': {
+        const room = player.room;
+        if (!room) break;
+        const nowTs = Date.now();
+        if (nowTs - player.lastYtAt < 1000) break;
+        player.lastYtAt = nowTs;
+        const nxt = room.yt.queue.shift() || null;
+        if (room.yt.current) {
+          // Keep replay history at end of queue if we have room, else drop
+          if (nxt && room.yt.queue.length < 20) room.yt.queue.push({ ...room.yt.current });
+        }
+        room.yt.current = nxt ? { ...nxt, startedAt: nowTs } : null;
+        scheduleSave();
+        room.broadcast(buildYtPayload(room));
+        break;
+      }
+
+      case 'yt-stop': {
+        const room = player.room;
+        if (!room) break;
+        const nowTs = Date.now();
+        if (nowTs - player.lastYtAt < 1000) break;
+        player.lastYtAt = nowTs;
+        if (room.yt.current) {
+          room.yt.queue.unshift({ ...room.yt.current });
+          room.yt.queue = room.yt.queue.slice(0, 25);
+          room.yt.current = null;
+          scheduleSave();
+          room.broadcast(buildYtPayload(room));
+        }
+        break;
+      }
+
+      case 'yt-disco': {
+        const room = player.room;
+        if (!room) break;
+        const nowTs = Date.now();
+        if (nowTs - player.lastYtAt < 500) break;
+        player.lastYtAt = nowTs;
+        room.yt.disco = msg.on !== undefined ? Boolean(msg.on) : !room.yt.disco;
+        scheduleSave();
+        room.broadcast(buildYtPayload(room));
+        room.broadcast({
+          t: 'ann',
+          k: 'yt',
+          text: room.yt.disco
+            ? `🪩 ${player.rec.name} vừa BẬT Quả cầu gương chiếu sáng trước Đài nhạc YouTube!`
+            : `🪩 ${player.rec.name} vừa TẮT Quả cầu gương sân chùa.`
+        });
         break;
       }
 

@@ -141,8 +141,8 @@ try {
   assert.equal(htmlRes.headers.get('cache-control'), 'no-cache');
   assert.equal((await fetch(`http://127.0.0.1:${PORT}/sw.js`)).status, 404);
   const htmlText = await htmlRes.text();
-  assert.ok(htmlText.includes('main-CPNz0KLo.js?v=2026111702'));
-  const jsRes = await fetch(`http://127.0.0.1:${PORT}/assets/main-CPNz0KLo.js?v=2026111702`);
+  assert.ok(htmlText.includes('main-CPNz0KLo.js?v=2026111804'));
+  const jsRes = await fetch(`http://127.0.0.1:${PORT}/assets/main-CPNz0KLo.js?v=2026111804`);
   assert.equal(jsRes.status, 200);
   assert.equal(jsRes.headers.get('cache-control'), 'no-cache');
   const jsText = await jsRes.text();
@@ -159,6 +159,12 @@ try {
   assert.ok(jsText.includes('_stepCarVisual'));
   assert.ok(jsText.includes('DtFx'));
   assert.ok(jsText.includes('HmFx'));
+  assert.ok(jsText.includes('MobFx'));
+  assert.ok(jsText.includes('BotFx'));
+  assert.ok(jsText.includes('cd-yt-'));
+  assert.ok(jsText.includes('yt-disco'));
+  assert.ok(jsText.includes('Đài nhạc YT'));
+  assert.ok(jsText.includes('yt-state'));
   assert.ok(jsText.includes('bach_long_ma.glb'));
   assert.ok(jsText.includes('ton_ngo_khong.glb'));
   assert.ok(jsText.includes('tru_ngo_nang.glb'));
@@ -539,6 +545,54 @@ try {
   assert.equal(raceMerit.me.total, 45);
   const raceAnn = await cA2.waitFor((m) => m.t === 'ann' && m.text?.includes('Đua Trâu') && m.text?.includes('về Nhất'));
   assert.ok(raceAnn.text.includes('Cực Khó'));
+
+  // Test Outer Pagoda Monster Combat ('mob-kill') merit rewards + room respawn cooldown + tier 3 announcement
+  cRace.send({ t: 'mob-kill', id: 'imp_sw', spell: 'Vạn Kiếm Quy Tông' });
+  const mobMerit1 = await cRace.waitFor((m) => m.t === 'merit' && m.gain?.n === 5);
+  assert.equal(mobMerit1.me.total, 50);
+  // Cooldown blocks immediate replay spam on the same monster ID
+  cRace.send({ t: 'mob-kill', id: 'imp_sw', spell: 'Như Lai Thần Chưởng' });
+  // Killing a different monster in the same AoE cast succeeds (multi-kill)
+  cRace.send({ t: 'mob-kill', id: 'boss_nw', spell: 'Như Lai Thần Chưởng' });
+  const mobMeritBoss = await cRace.waitFor((m) => m.t === 'merit' && m.gain?.n === 20);
+  assert.equal(mobMeritBoss.me.total, 70);
+  const bossAnn = await cA2.waitFor((m) => m.t === 'ann' && m.text?.includes('Ma Tướng Tây Sơn'));
+  assert.ok(bossAnn.text.includes('+20 Công đức'));
+
+  // Test Community YouTube Music Board ('yt-add', 'yt-play', 'yt-next', 'yt-stop', welcome sync, room isolation)
+  cA2.send({ t: 'yt-add', url: 'not-a-youtube-link', title: 'Bad' });
+  const badYtNotice = await cA2.waitFor((m) => m.t === 'notice' && m.text?.includes('không hợp lệ'));
+  assert.ok(badYtNotice.text.includes('Link YouTube'));
+  cA2.send({ t: 'yt-add', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', title: 'Nhạc Thiền An Lạc', playNow: true });
+  const ytState1 = await cRace.waitFor((m) => m.t === 'yt-state' && m.current?.videoId === 'dQw4w9WgXcQ');
+  assert.equal(ytState1.current.title, 'Nhạc Thiền An Lạc');
+  const ytAnn1 = await cRace.waitFor((m) => m.t === 'ann' && m.k === 'yt');
+  assert.ok(ytAnn1.text.includes('Nhạc Thiền An Lạc'));
+  await new Promise((r) => setTimeout(r, 1250));
+  cRace.send({ t: 'yt-add', url: 'https://youtu.be/jNQXAC9IVRw', title: 'Chuông Chùa Sáng Sớm', playNow: false });
+  const ytState2 = await cA2.waitFor((m) => m.t === 'yt-state' && m.queue?.length === 1);
+  assert.equal(ytState2.queue[0].videoId, 'jNQXAC9IVRw');
+  await new Promise((r) => setTimeout(r, 1050));
+  cA2.send({ t: 'yt-next' });
+  const ytState3 = await cRace.waitFor((m) => m.t === 'yt-state' && m.current?.videoId === 'jNQXAC9IVRw');
+  assert.equal(ytState3.current.title, 'Chuông Chùa Sáng Sớm');
+  await new Promise((r) => setTimeout(r, 550));
+  cA2.send({ t: 'yt-disco', on: true });
+  const ytDisco1 = await cRace.waitFor((m) => m.t === 'yt-state' && m.disco === true);
+  assert.equal(ytDisco1.disco, true);
+  const ytDiscoAnn = await cRace.waitFor((m) => m.t === 'ann' && m.k === 'yt' && m.text?.includes('Quả cầu gương'));
+  assert.ok(ytDiscoAnn.text.includes('BẬT'));
+
+  // Joining Chua-1 receives current yt state inside welcome packet; Chua-2 has independent yt queue
+  const cYtJoin = new TestClient();
+  await cYtJoin.connect();
+  cYtJoin.send({ t: 'hello', v: 2, cid: 'test-cid-yt-001', name: 'Nghe Nhạc', room: 'chua-1' });
+  const ytWelcome = await cYtJoin.waitFor((m) => m.t === 'welcome');
+  assert.equal(ytWelcome.yt?.current?.videoId, 'jNQXAC9IVRw');
+  cYtJoin.send({ t: 'room-go', room: 'chua-2' });
+  const ytRoom2 = await cYtJoin.waitFor((m) => m.t === 'room' && m.room === 'chua-2');
+  assert.equal(ytRoom2.yt?.current, null);
+  await cYtJoin.close();
   await cRace.close();
 
   await cA2.close();
@@ -553,8 +607,12 @@ try {
   assert.equal(savedDisk.characters[cidA].title, 'nguyen_lanh');
   assert.equal(savedDisk.characters[cidA].unlockedTitles.length, 17);
   assert.equal(savedDisk.characters[cidB].merit, 0);
-  assert.equal(savedDisk.characters[cidRace].merit, 45);
+  assert.equal(savedDisk.characters[cidRace].merit, 70); // 45 race + 5 imp + 20 boss
   assert.equal(savedDisk.accounts['nangxanh'], cidA);
+  const savedWorld = JSON.parse(fs.readFileSync(WORLD_FILE, 'utf8'));
+  assert.equal(savedWorld.rooms['chua-1']?.yt?.current?.videoId, 'jNQXAC9IVRw');
+  assert.equal(savedWorld.rooms['chua-1']?.yt?.disco, true);
+  assert.equal(savedWorld.rooms['chua-1']?.yt?.queue?.length, 1);
   assert.equal(fs.existsSync(CONFIG_FILE), true);
   const savedCfg = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
   assert.deepEqual(savedCfg.buffaloRace, { enabled: true, botCount: 8, difficulty: 'cuckho', mapMode: 'extreme', laps: 3, autoSchedule: true, intervalMin: 10, ambientBots: true });
