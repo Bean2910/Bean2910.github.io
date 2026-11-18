@@ -1,8 +1,9 @@
 # 📋 Tài liệu Bàn giao Công việc · Dự án `didenchua` (An Tự Duyên 3D)
 
-> **Thời điểm bàn giao:** `2026-11-14`  
+> **Thời điểm cập nhật:** `2026-11-18`  
 > **Repository:** `https://github.com/Bean2910/didenchua.git` (`main`)  
-> **Trạng thái tổng quan:** Backend, hệ thống lưu trữ nhân vật, Trang quản trị `/admin`, và bộ test E2E hoạt động ổn định. Chức năng **Cưỡi hạc bay tự do 6 hướng** đã hoàn thành **phần Backend & Admin**, đang **tạm ngưng trước bước patch Frontend (`client/assets/main-CPNz0KLo.js`)** để bàn giao.
+> **Phiên bản client hiện hành:** `index.html` (`?v=2026111804`) · Đã đẩy code lên `origin/main`  
+> **Trạng thái tổng quan:** Toàn bộ Backend Node.js (`3.287` dòng), Frontend 3D Three.js (`client/assets/main-CPNz0KLo.js`), Trang quản trị `/admin`, và bộ kiểm thử E2E (`server/tests/verify_server.mjs`, `636` dòng) đã hoàn thiện và kiểm thử vượt qua toàn bộ.
 
 ---
 
@@ -12,30 +13,38 @@
 didenchua/
 ├── client/                              # Frontend 3D Three.js (production bundle + assets tĩnh)
 │   ├── assets/
-│   │   ├── main-CPNz0KLo.js             # Bundle JS chính của game (hiện còn NGUYÊN BẢN chưa patch)
+│   │   ├── main-CPNz0KLo.js             # Bundle JS chính đã tích hợp toàn bộ tính năng mới
 │   │   ├── main-DWI8sA1o.css            # Stylesheet chính
 │   │   └── modulepreload-polyfill-B5Qt9EMX.js
 │   ├── draco/                           # Bộ giải mã WebAssembly Draco
 │   ├── icons/                           # Icon PWA
-│   ├── models/                          # 39 mô hình 3D (.glb)
+│   ├── models/                          # 45 mô hình 3D (.glb)
+│   │   ├── tien_kiem.glb                # Kiếm 3D cho Vạn Kiếm Quy Tông & Kiếm Luân
+│   │   ├── sieu_xe_hieu_ung_khoi.glb    # Siêu xe đường đua (4 bánh quay + khói ống xả)
+│   │   ├── bach_long_ma.glb             # Bạch Long Mã (cưỡi tự do & đua)
+│   │   ├── ton_ngo_khong.glb            # Đệ tử Tôn Ngộ Không
+│   │   ├── tru_ngo_nang.glb             # Đệ tử Trư Ngộ Năng
+│   │   ├── sa_ngo_tinh.glb              # Đệ tử Sa Ngộ Tĩnh
+│   │   └── ... (39 model gốc của chùa: trau_*, rua_*, phap khi, linh vat, hoa sen...)
 │   ├── music/                           # Nhạc nền Chánh điện & kinh tụng (.mp3)
-│   ├── index.html                       # Đã gỡ Cloudflare telemetry
+│   ├── index.html                       # Đã gỡ Cloudflare telemetry · cache tag ?v=2026111804
 │   └── package.json / vite.config.js
 │
 ├── server/                              # Backend Node.js + WebSocket (ws) + Admin GUI
 │   ├── admin/
-│   │   ├── index.html                   # Giao diện Quản trị Chùa (/admin)
+│   │   ├── index.html                   # Giao diện Quản trị Chùa (/admin, 4 tab + Đua Trâu)
 │   │   ├── admin.css
 │   │   └── admin.js
-│   ├── data/                            # Dữ liệu runtime JSON (bị gitignore; tự tạo khi khởi động)
+│   ├── data/                            # Dữ liệu runtime JSON (gitignore; tự tạo khi khởi động)
 │   │   ├── .gitkeep
-│   │   ├── config.json                  # Cấu hình nhiệm vụ, phần thưởng, linh vật, lễ hội, PIN
+│   │   ├── config.json                  # Cấu hình chung, nhiệm vụ, thưởng, linh vật, lễ hội, Đua trâu
 │   │   ├── players.json                 # Tài khoản & hồ sơ nhân vật lưu theo cid
-│   │   └── world.json                   # Trạng thái sân chùa, hoa đăng, Bảng vàng
+│   │   └── world.json                   # Trạng thái sân chùa, hoa đăng, Bảng vàng & Đài nhạc YouTube
 │   ├── tests/
-│   │   └── verify_server.mjs            # Bộ kiểm thử E2E HTTP + WebSocket + Admin API
+│   │   └── verify_server.mjs            # Bộ kiểm thử E2E HTTP + WebSocket + Admin API (636 dòng)
+│   ├── race_schedule.js                 # Bộ tính chu kỳ giải Đua Trâu theo giờ VN (88 dòng)
 │   ├── package.json                     # Phụ thuộc: "ws": "^8.19.0" ("type": "module")
-│   └── server.js                        # Máy chủ HTTP + WebSocket (~2.980 dòng)
+│   └── server.js                        # Máy chủ HTTP + WebSocket (3.287 dòng)
 │
 ├── capture/                             # Tài liệu phân tích giao thức / trạng thái tham khảo
 ├── run.bat                              # Script khởi động nhanh trên Windows (port 8080)
@@ -48,87 +57,87 @@ didenchua/
 
 ---
 
-## 2. Công việc ĐÃ HOÀN THÀNH
+## 2. Lịch sử Các Mốc Công việc ĐÃ HOÀN THÀNH
 
-### 2.1. Backend Game Server (`server/server.js`)
+| Commit | Nội dung chính |
+| :--- | :--- |
+| `c70ef15` / `5d97d4c` | Khởi tạo Backend `server.js`, lưu trữ JSON bền vững, Admin GUI `/admin` 4 tab, E2E test, `run.bat`, tài liệu bàn giao ban đầu. |
+| `0cf2e6f` | **Cưỡi hạc bay tự do 6 hướng (`tudo`)**, hệ thống menu **Thần thông**, **Vạn Kiếm Quy Tông (`V`)**, **Như Lai Thần Chưởng (`N`)**, **Súc Địa Thành Thốn (`W/A/S/D × 2`)**, **Kiếm Luân Hộ Thể (`K`)**, **Vòng Hào Quang (`H`)**. |
+| `47bfbe3` | **Trường đua quanh chùa (`RaceSys`)**: chọn Trâu / Siêu xe / Bạch Long Mã, chướng ngại vật (vũng nước làm chậm, khúc gỗ chặn đường), Drift tụ Turbo (`Space`), lịch giải định kỳ 10 phút + Bot AI; thêm **3 Đệ tử theo sau (`DtFx`)** và **Cưỡi Bạch Long Mã (`HmFx`)**. |
+| `78dad6c` | Fix di chuyển khi cưỡi Bạch Long Mã ngoài sân, tự động xuống ngựa khi bước vào Chánh điện, hạ pill lịch Đua trâu xuống dưới thanh hiển thị Công đức. |
+| `c36926a` (mới nhất) | **Quái vật ngoài chùa (`MobFx`)** cày Công đức bằng Thần thông; **Đài nhạc YouTube 16:9 (`YtFx`)** dời ra trước cây Bồ Đề `(16.2, 28.5)` chiếu live thẳng lên bảng 3D; **Quả cầu gương Disco 7 sắc cầu vồng gradient (`yt-disco`)**; **28 nệm ngồi kiểu Chánh Điện (`cd-yt-0..27`)**; và **7 Bot thiện tín (`BotFx`)** ngồi xem & tương tác theo sự kiện chùa. |
+
+---
+
+## 3. Chi tiết Hệ thống & Tính năng hiện có
+
+### 3.1. Backend Game Server & API Quản trị (`server/server.js`, `server/admin/`)
 - **Lưu trữ bền vững (`server/data/*.json`):**
-  - Hồ sơ nhân vật theo `cid` (`merit`, `todayMerit`, `weekMerit`, `days`, `streak`, `bestStreak`, `bows`, `rounds`, `countedBeads`, `sitSec`, `sitMin`, `incenseCount`, `lanternCount`, `bellCount`, `moCount`, `sweepCount`, `feedCount`, `vowCount`, `quizCount`, `tkDone`, `pet`, `chores`, `visitedZones`, `bode`, `keeps`, `leProgress`, `lvTrau`, `lvHac`, `lvRua`, `amSlots`).
-  - Hệ thống tài khoản (`register` / `login` / đổi mật khẩu) & kiểm tra cấm (`banned`).
-- **Hệ thống Công đức & Nhiệm vụ (`questsConfig`, `rewards`):**
-  - Nhiệm vụ Ngày (6 việc), Tuần (9 việc + thưởng mốc 6/9), Tân thủ (3 việc ban đầu -> xong mới chuyển tiếp), đồng bộ realtime với cấu hình Admin qua `syncQuestPool`.
-  - Mức thưởng công đức cho từng hành động (`incense`, `lay`, `bell`, `mo`, `sitMin`, `quet`, `ca`, `xam`, `lantern`, `vow`, v.v.) có thể cấu hình động từ Admin.
-- **Hệ thống 17 Danh hiệu (`TITLE_DEFS`):**
-  - Kiểm tra điều kiện mở khóa hoặc mở khóa thủ công từ Admin (`unlockedTitles`), lưu theo ID nhân vật, chỉ cho phép đeo danh hiệu đã mở khóa (`title`).
-- **Linh vật & Chế độ chia khung giờ (`LINH_VAT_WINDOWS`, `linhVatSessionCooldown`):**
-  - Trâu (10 tranh, `6–12h` & `12–18h`), Hạc trắng (7 bậc, `5–9h` & `16–19h`), Rùa thần (7 bậc, `5–11h` & `14–19h`).
-  - Hỗ trợ bật/tắt giới hạn theo ca Sáng/Chiều từ Admin.
-- **Lễ hội, Đố vui, Bảng vàng & Tiện ích:**
-  - Lễ hội (`festival` + `leProgress` + `claim-le`) với các preset (Rằm, Mùng 1, Phật Đản, Vu Lan, Tết).
-  - Live Đố vui Phật pháp (`quiz` engine + đố vui luyện tập `quiz-practice`).
-  - Bảng tin ghim, thông báo toàn chùa, Hộp thư Ban quản lý (`sp`), Bảng vàng công đức (`donors`).
-  - `/api/pass` trả `{ off: true }` để chạy offline/LAN không bị chặn Captcha.
+  - Hồ sơ theo `cid` (`merit`, `todayMerit`, `weekMerit`, `days`, `streak`, `bestStreak`, `bows`, `rounds`, `countedBeads`, `sitSec`, `sitMin`, `incenseCount`, `lanternCount`, `bellCount`, `moCount`, `sweepCount`, `feedCount`, `vowCount`, `quizCount`, `tkDone`, `pet`, `chores`, `visitedZones`, `bode`, `keeps`, `leProgress`, `lvTrau`, `lvHac`, `lvRua`, `amSlots`).
+  - Dữ liệu thế giới phòng (`world.json`): `incense`, `yardIncense`, `sideIncense`, `lamps`, `lanterns`, `vows`, `pinned`, `donors`, và trạng thái **Đài nhạc YouTube + Quả cầu gương (`yt`: `{ current, queue, disco }`)**.
+- **Hệ thống Công đức, Nhiệm vụ & 17 Danh hiệu (`TITLE_DEFS`):**
+  - Nhiệm vụ Ngày (6 việc), Tuần (9 việc), Tân thủ (3 việc ban đầu); bảng thưởng `rewards` chỉnh sửa nóng từ `/admin`.
+  - 17 danh hiệu tự mở khóa theo điều kiện hoặc cấp thủ công từ Admin (`⚡ Mở hết 17 danh hiệu` / `↺ Chỉ giữ mặc định`).
+- **Linh vật & Lễ hội & Đố vui:**
+  - Trâu (10 tranh), Hạc trắng (7 bậc, bay `tudo`/`dua`/`tron`), Rùa thần (7 bậc); công tắc bật/tắt giới hạn khung giờ (`linhVatSessionCooldown`) và bay hạc tự do mọi lúc (`allowFreeCraneAnytime`).
+  - Lễ hội (`ram`, `mung1`, `phatdan`, `vulan`, `tet`...) & Đố vui Phật pháp trực tiếp / luyện tập.
+- **Cấu hình & Điều phối Trường đua (`buffaloRace`, `server/race_schedule.js`):**
+  - Mặc định mở giải định kỳ mỗi 10 phút (`autoSchedule: true`, `intervalMin: 10`), cửa sổ tham gia 90 giây, cảnh báo trước **3p / 2p / 1p**, phát tín hiệu `race-sched` đồng bộ seed/mapKind/botCount/difficulty/laps.
+  - Admin Tab 1 có card **Trường Đua Trâu Quanh Chùa (Bot AI)** hỗ trợ lưu config và nút **`🏁 Mở giải đua ngay`**.
+- **Các handler WebSocket mới đã tích hợp:**
+  - `mob-kill`: Thưởng Công đức theo 9 ID quái (`imp_*` +5/12s, `beast_*` +10/18s, `boss_*` +20/28s cooldown phòng; Boss bậc 3 phát thông báo `ann` toàn phòng).
+  - `yt-add`, `yt-play`, `yt-next`, `yt-stop`, `yt-disco`: Validate ID YouTube 11 ký tự (`youtube.com/watch`, `youtu.be`, `shorts/`, `live/`, `embed/`), đồng bộ `yt-state` realtime cả phòng và lưu `world.json`; Admin `/api/admin/world` có `action: 'clear-yt'`.
+  - `duatrau-done`: Ghi nhận hạng về đích & nhân hệ số thưởng theo độ khó (`de ×1`, `trungbinh ×1.5`, `kho ×2`, `cuckho ×3`).
+  - `/api/pass` trả `{ off: true }` để chạy LAN/local không bị vướng Captcha.
 
-### 2.2. Trang Quản trị Chùa (`/admin` — `server/admin/`)
-- Giao diện 4 tab:
-  1. **Tổng quan & Sự kiện:** Chia giờ Linh Vật, bật/tắt cưỡi hạc tự do mọi lúc, Thông báo & Ghim, mã PIN `/admin`, Lễ hội (kèm preset & chỉnh từng bước), Điều khiển Live Đố vui.
-  2. **Nhiệm vụ & Công đức:** Sửa trực tiếp bảng điểm thưởng `rewards` và danh sách nhiệm vụ Ngày / Tuần / Tân thủ + nút đồng bộ ngay xuống người chơi.
-  3. **Người chơi & Danh hiệu:** Xem/chỉnh toàn bộ thông số nhân vật, tiến trình 3 linh vật, mở từng danh hiệu hoặc bấm **`⚡ Mở hết 17 danh hiệu`** / **`↺ Chỉ giữ mặc định`**; đã fix lỗi tự làm mới 5s làm mất dữ liệu đang nhập (`playerDetailDirty`) và đẩy realtime `merit` + `hanhtrinh` + `journal` + `linhvat` về client đang online.
-  4. **Sân chùa & Bảng vàng:** Quản lý hương, đèn, danh sách hoa đăng, thêm/xóa tên trên Bảng vàng.
+### 3.2. Cưỡi Hạc Bay Tự Do & Hệ thống Thần Thông (`VkFx`, `TtM`)
+- **Menu Thần thông (`TtM`):** Nằm cạnh nút `Động tác` trên HUD và hỗ trợ phím tắt (tự động khóa khi đang mở các modal / nhập chat / link):
+  - **`Cưỡi hạc bay tự do`:** Cất cánh tại chỗ (ngoài Chánh điện/Pháp đường); `WASD`/mũi tên/Joystick bay theo hướng camera, kéo chuột ngước lên/xuống tự do (`freeLook`), giữ `Space`/`R`/`PageUp` (hoặc nút `Bay lên`) để lên cao, `C`/`Ctrl`/`PageDown` (hoặc `Bay xuống`) để hạ độ cao; đồng bộ tọa độ `y` & dáng ngồi `fly` cho người chơi khác.
+  - **`Vạn Kiếm Quy Tông` (`V`):** Gọi kiếm trận 3D (`tien_kiem.glb`, 60 thanh kiếm 3 tầng) giáng xuống phía trước, gây **2 đợt sát thương AoE (`85` + `95` HP)**.
+  - **`Như Lai Thần Chưởng` (`N`):** Bàn tay Phật khổng lồ giáng từ trên mây kèm hiệu ứng hố chưởng & rung camera, gây **`200` sát thương AoE** trong bán kính `10.5m`.
+  - **`Súc địa thành thốn` (`W×2` / `A×2` / `S×2` / `D×2`):** Lướt dịch chuyển tức thời kèm ấn ring & tia sáng.
+  - **`Kiếm luân hộ thể` (`K`)** & **`Vòng hào quang` (`H`):** Bật/tắt 32 thanh kiếm xoay sau lưng và hào quang Phật xoay theo góc nhìn, đồng bộ qua `kl-on`/`kl-off`/`hq-on`/`hq-off`.
 
-### 2.3. Tiện ích khởi động (`run.bat`)
-- Đã sửa lỗi cú pháp Batch trên Windows khi chạy từ PowerShell/CMD: tự dọn tiến trình cũ đang nghe cổng `8080`, mở trình duyệt `http://localhost:8080/?phong=chua-1` và chạy `node server.js`.
+### 3.3. Đệ tử Theo Sau (`DtFx`) & Cưỡi Bạch Long Mã (`HmFx`)
+- **3 Đệ tử theo sau (`G` hoặc chip chọn lẻ trong `Thần thông`):**
+  - `ton_ngo_khong.glb` (Tôn Ngộ Không), `tru_ngo_nang.glb` (Trư Ngộ Năng), `sa_ngo_tinh.glb` (Sa Ngộ Tĩnh) — tự đi/chạy bám đội hình sau lưng, tự bay theo khi cưỡi hạc, đồng bộ bitmask `dt-0..7` sang người chơi khác.
+- **Cưỡi Bạch Long Mã (`M`):**
+  - Model `bach_long_ma.glb` có khớp cổ, đuôi, 4 chân bước kiệu / phi nước đại (giữ `Shift` tốc độ `×2.65`, bình thường `×1.65`), tự động thu hồi/xuống ngựa khi bước vào trong Chánh điện (`ct.hall`), đồng bộ qua `ma-1`/`ma-0`.
 
----
+### 3.4. Trường Đua Quanh Chùa (`RaceSys`)
+- **Cổng Đua Tây Chùa & Vòng đua bao quanh chùa:** 5 chế độ cung đường sinh động (`random`, `easy`, `medium`, `complex`, `extreme`) tránh vũng nước (giảm tốc) và khúc gỗ (va chạm chặn/trượt tường), hiển thị mini-map trực tiếp trong sảnh chờ.
+- **3 Phương tiện đua:** Trâu truyền thống, **Bạch Long Mã (`ngua`)**, và **Siêu xe (`sieu_xe_hieu_ung_khoi.glb`)** với 4 bánh quay & 16 cụm khói ống xả.
+- **Điều khiển:** `↑↓←→` / Joystick / `WASD` lái; `Ctrl` / `Tăng tốc` chạy thanh thể lực; `Space` / `Drift` trượt cua tích tụ Turbo bứt tốc.
+- **Lịch định kỳ & Hàng chờ:** Nếu chưa tới giờ giải chính thức vẫn có thể chọn **`⏳ Vào hàng chờ`** (chờ đếm ngược xuất phát đồng bộ) hoặc **`🏇 Đua tập`** thử đường ngay.
 
-## 3. Công việc ĐANG LÀM DỞ (Cần tiếp tục)
+### 3.5. Quái Vật Ngoài Chùa (`MobFx`)
+- **9 quái vật tuần tra ngoài khuôn viên nội tự** (chấm hiển thị trên bản đồ nhỏ, thanh máu & sát thương nổi HUD):
+  - 4 **Tiểu Yêu** (`imp_sw`, `imp_se`, `imp_w`, `imp_e`): `100 HP`, thưởng `+5 Công đức`, hồi sinh `12s`.
+  - 3 **Yêu Lang / Yêu Thú** (`beast_sw`, `beast_se`, `beast_w`): `160 HP`, thưởng `+10 Công đức`, hồi sinh `18s`.
+  - 2 **Ma Tướng Boss** (`boss_nw`, `boss_ne`): `320 HP`, thưởng `+20 Công đức`, hồi sinh `28s`, khi hạ gục có thông báo toàn phòng.
 
-### Yêu cầu hiện tại: **Bổ sung chức năng cưỡi hạc bay tự do (bay lên, xuống, trái, phải, tới, lui) trong chùa**
-
-#### A. Phần ĐÃ XONG ở Backend & Admin (đã có trong commit này):
-1. **`server/server.js`:**
-   - Thêm `allowFreeCraneAnytime: true` vào `getDefaultConfig()` và `normalizeConfig()`.
-   - Trong `buildLinhVatPayload(rec)`: thêm `'tudo'` vào `hac.fly` khi `hacS >= 4 || Boolean(gameConfig.allowFreeCraneAnytime)`.
-   - Thêm `this.flying = false` trong `class Player` và trường `fly: this.flying ? 1 : 0` trong `toPeerObject()`.
-   - Cập nhật `case 'lv-bay':` (hỗ trợ cả `{ k: 'tudo' | 'dua' | 'tron' }` mà client thực tế gửi lên lẫn `{ on }`) và bổ sung `case 'lv-xuong':` để đồng bộ trạng thái bay/hạ cánh cho người chơi khác trong phòng.
-2. **`server/admin/index.html` & `server/admin/admin.js`:**
-   - Thêm công tắc **`🦢 Cưỡi hạc bay tự do mọi lúc`** (`#freeCraneToggle`) trong Tab 1 (thẻ Linh Vật) kết nối `/api/admin/config`.
-3. **Lưu ý tương thích:** Frontend hiện tại (`client/assets/main-CPNz0KLo.js`) chưa được chỉnh sửa; client cũ sẽ chỉ nhận mảng `hac.fly` chứa `'tudo'` nhưng không bị lỗi vì nó chỉ kiểm tra `t.fly.includes("dua")`.
-
-#### B. Phần CHƯA LÀM ở Frontend (`client/assets/main-CPNz0KLo.js`):
-Frontend hiện chỉ hỗ trợ bay hạc theo đường cong `Kf` dựng sẵn (`dua` / `tron`) khi Hạc đạt bậc `>= 4` và đang ở hồ (`x0`). Toàn bộ vị trí mã (`anchor` / `offset`) trong `client/assets/main-CPNz0KLo.js` đã được khảo sát sẵn để người nhận bàn giao viết script patch trực tiếp:
-
-1. **Điều khiển bay tự do 6 hướng trong `class Dk` (`Vi`, offset ~`1113080`):**
-   - Trong `fly(t, e, i, s, yaw)`: thêm nhánh `e === "tudo"`:
-     - Cho phép cất cánh ngay tại vị trí hiện tại `Q.root.position` (không phụ thuộc `this.present` hay bắt đi bộ ra hồ `Xa`).
-     - Khởi tạo `this.flight = { manual: !0, landing: !1, vx: 0, vy: 2.4, vz: 0, roll: 0, pitch: 0 }`, `this.carrying = "tudo"`.
-   - Trong `update(t, e, i, s, o)`: khi `this.flight.manual`:
-     - **Bay ngang (trái/phải/tới/lui):** Đọc từ `ov.move()` (`WASD` / phím mũi tên / `Shift` tăng tốc / Joystick cảm ứng), nhân vận tốc nền (gợi ý ~`11 m/s`, giữ `Shift` `1.6x`).
-     - **Bay lên / bay xuống:** Đọc phím từ `ov.keys`: `Space` (`" "`) / `R` / `PageUp` (bay lên), `C` / `Control` / `PageDown` (bay xuống), kết hợp nút giữ/bấm trên HUD (`climbHold` / `climbPulse`), vận tốc dọc ~`9 m/s`. *(Lưu ý: `Q` và `E` đang dùng cho `ov.turnCamera(t)` nên giữ nguyên để xoay góc nhìn).*
-     - **Giới hạn biên sân chùa:** kẹp `(x, z)` trong `ct.bounds` (`{ x0: -58, x1: 72, z0: -82, z1: 157 }`, chừa lề ~2m) và kẹp `y` trong `[Bn(x, z) + 0.65, 48]`.
-     - **Chuyển động cánh & nghiêng thân:** Xoay `this.heading` mượt theo hướng bay ngang, tính độ nghiêng cánh (`roll`) khi rẽ và chúc/ngóc đầu (`pitch`) theo `vy`, gọi `Nd(a, m.vy > .35 || hSpd > 2 ? "fly" : "glide", e, 0, this.open)`.
-   - Trong `land()`: khi `this.flight.manual`, bật `this.flight.landing = !0` để hạc đáp thẳng xuống mặt đất `Bn(x, z)` bên dưới chỗ đang bay rồi cho nhân vật xuống tại chỗ (`Q.state = "idle"`, `en = !1`, gửi `{ t: "lv-xuong" }`), nếu ngoài hồ (`!x0(endPos)`) mới đặt lại model hạc chờ về `Xa`.
-
-2. **Vòng lặp chính, Camera & Đồng bộ Multiplayer:**
-   - **Main Loop (offset ~`1303000`–`1305200`):**
-     - Mở khóa `ov.move()` khi bay tự do: đổi `en || ...` thành `(en && Vi.carrying !== "tudo") || ...` (và chỉ cập nhật biến đi bộ `At` khi `!en`).
-     - Truyền `s?.dir ?? null` (thay vì hướng đầu hạc) vào `Ae.follow(...)` khi `Vi.carrying === "tudo"` để bay lùi (`S`) hoặc bay ngang (`A/D`) không làm camera tự xoay giật ngược.
-     - Truyền `!en && r === "Chánh điện"` vào `Ae.update(...)` và `Zy.update(...)` để khi bay bên trên mái Chánh điện camera không bị ép zoom/góc nhìn trong nhà.
-   - **Đồng bộ `y` và tư thế ngồi cho Peer khác:**
-     - Trong `Ji()` (offset ~`1271590`): thêm điều kiện `Math.abs(e.y - Ua.y) > .05` (lưu `Ua.y`) để thay đổi độ cao được gửi `{ t: "state", ... }` ngay mỗi 150ms.
-     - Trong `Peer.update` (offset ~`660728`): đổi `this.state === 2 ? "sit" : ...` thành `this.info.fly || this.state === 2 ? "sit" : ...` để người chơi khác bay trên hạc vẫn giữ dáng ngồi thiền thay vì chạy bộ trên không.
-
-3. **Điểm kích hoạt UI & Nút điều khiển trên HUD:**
-   - **Modal `Hạc trắng` (`class zk`, `ji`, offset ~`1119976`) & `Eb(n)` (`1283252`):**
-     - Hiển thị nút **`Cưỡi hạc bay tự do`** (`data-fly="tudo"`) khi `t.fly?.includes("tudo")` ngay cả khi chưa ở hồ hoặc ngoài giờ sáng/chiều; trong `Eb("tudo")` bỏ yêu cầu đi bộ ra hồ `x0` (chỉ chặn nếu đang ở trong Am riêng `oe` hoặc Pháp đường `Ge`).
-   - **Menu `Động tác` (`kT` `661978`, `Og` `663414`, `Um` `1277762`):**
-     - Thêm mục `hac: "Cưỡi hạc bay tự do"` để gọi hạc trực tiếp từ mọi vị trí trong chùa.
-   - **Thanh hành động khi đang bay (`So` `667377`, `XR` `1276202`, `HUD.renderActions`):**
-     - Khi `en && Vi.carrying === "tudo"`, trả 3 nút: **`Bay lên`** (`haclen`, hỗ trợ giữ `pointerdown`/`pointerup` hoặc nhấp ngắn), **`Bay xuống`** (`hacxuong`), **`Hạ cánh`** (`xuong`).
-     - Nhớ gọi `blur()` sau khi bấm button / `preventDefault()` phím `Space` khi đang bay tự do để phím `Space` không kích hoạt nhầm lại button HTML vừa bấm.
+### 3.6. Đài Nhạc YouTube 16:9, Quả Cầu Gương 7 Sắc Cầu Vồng, 28 Nệm Ngồi & Bot Sự Kiện (`YtFx`, `BotFx`)
+- **Đài nhạc YouTube 16:9 (`YtFx` tại `(16.2, 28.5)` trước cây Bồ Đề):**
+  - Khung màn hình rộng chuẩn **`8.0m × 4.5m` (16:9)** nâng cao `1.10m`, chiếu video YouTube (`<iframe>`) **trực tiếp lên mặt bảng 3D ngoài sân chùa** theo góc nhìn camera thực qua CSS3D `sync3D(Pe)` (tự ẩn mặt lưng khi đứng sau bảng hoặc khi vào trong Chánh điện).
+  - Bảng điều khiển hỗ trợ dán link YouTube, **Phát ngay lên bảng**, **Thêm hàng chờ**, **Bài tiếp**, **Dừng phát**, **Thu nhỏ PiP** (không bị tải lại iframe khi chuyển giữa `world` ↔ `modal` ↔ `pip`).
+- **Quả cầu gương Disco 7 sắc cầu vồng Gradient (`yt-disco`):**
+  - Treo trên giàn truss trước màn chiếu (`(16.2, 6.22, 30.85)`), phủ texture mosaic `36×18` ô kính + shader cầu vồng lấp lánh, **10 luồng tia ánh sáng gradient 7 sắc**, **144 đốm sáng phản chiếu (`InstancedMesh`)** xoay dưới sân & không gian xung quanh, cùng 2 `PointLight` đổi màu cầu vồng. Bật/tắt qua click trực tiếp quả cầu, nút HUD **`Quả cầu gương`**, hoặc trong modal YouTube.
+- **28 nệm ngồi kiểu Chánh Điện (`cd-yt-0..cd-yt-27`):**
+  - Xếp **4 hàng × 7 cột** ngay trước màn chiếu (`x = 11.4..21.0`, `z = 31.7..38.0`), click tới ngồi hướng mặt vào màn hình (`facing = Math.PI`), tính phút tĩnh tọa `sitMin`.
+- **7 Bot thiện tín (`BotFx`):**
+  - Tự tìm nệm ngồi xem chiếu (tối đa 6 bot ngồi đồng thời, luôn chừa ≥22 nệm cho người chơi), phản ứng & trò chuyện bong bóng chat khi có bài YouTube mới, bật/tắt Quả cầu gương, diệt quái/Boss, người mới vào/lên cấp, dùng động tác gần bot, và tự kéo ra cổ vũ gần cổng Tây khi sắp/đang Đua trâu.
 
 ---
 
-## 4. Hướng dẫn Cài đặt, Chạy & Kiểm thử
+## 4. Lưu ý kỹ thuật khi phát triển & bảo trì tiếp
+
+- **Cơ chế cập nhật `client/assets/main-CPNz0KLo.js`:**
+  - Frontend sử dụng bản build bundle đã minify; mọi nâng cấp JS/CSS từ ngày 16–18/11 đều được áp dụng có kiểm soát thông qua script Node `replaceExact(...)` (lưu bản gốc tham chiếu tại thư mục scratch của phiên làm việc) kèm audit `'use strict'` để đảm bảo không trùng biến cục bộ minify (ví dụ tránh tên trùng như `Yc`, ưu tiên tiền tố module riêng `VkFx`, `DtFx`, `HmFx`, `MobFx`, `YtFx`, `BotFx`, `RaceSys`).
+  - Mỗi lần sửa bundle client cần tăng query cache-bust trong [client/index.html](file:///D:/python/didenchua/client/index.html) (hiện tại `?v=2026111804`) và cập nhật khớp trong `server/tests/verify_server.mjs`, sau đó nhắc người chơi nhấn **`Ctrl + F5`**.
+
+---
+
+## 5. Hướng dẫn Cài đặt, Chạy & Kiểm thử
 
 ### Cài đặt phụ thuộc (khi clone mới)
 ```powershell
@@ -146,15 +155,21 @@ npm install
 - **Game 3D:** `http://localhost:8080/?phong=chua-1`
 - **Trang Quản trị Admin:** `http://localhost:8080/admin`
 
-### Kiểm tra cú pháp & Test E2E (đã verify pass trước khi push)
+### Kiểm tra cú pháp & Test E2E (đã verify pass toàn bộ ở trạng thái hiện tại)
 ```powershell
-# Kiểm tra cú pháp JS (phải exit code 0)
+# 1. Kiểm tra cú pháp JS (exit code 0)
 node --check client/assets/main-CPNz0KLo.js
 node --check server/server.js
 node --check server/admin/admin.js
+node --check server/race_schedule.js
 node --check server/tests/verify_server.mjs
 
-# Chạy bộ test E2E (tự động test trên port 18080, tự backup & khôi phục server/data/)
+# 2. Chạy bộ test E2E (test cô lập trên port 18080, tự backup & khôi phục server/data/)
 node server/tests/verify_server.mjs
 ```
-> **Kết quả kiểm thử gần nhất trước bàn giao:** `node --check` 4 file trên đều exit code `0`, và `node server/tests/verify_server.mjs` in **`ALL E2E ASSERTIONS PASSED!`** (exit code `0`), bao gồm test cấu hình `allowFreeCraneAnytime`, `hac.fly`, broadcast `lv-bay` / `state` (`y`) / `lv-xuong`, nhiệm vụ, công đức, 17 danh hiệu, lễ hội `le`, và đố vui trực tiếp.
+
+> **Kết quả kiểm thử gần nhất (`2026-11-18`):**
+> - `node --check` trên client bundle & backend server đều exit code `0`.
+> - Runtime audit `'use strict'` trên các module `RaceSys`, `DtFx`, `HmFx`, `MobFx`, `YtFx` (`16:9` + Mirror Ball 7 sắc cầu vồng gradient + `28` nệm ngồi `cd-yt-*`), `BotFx` (`7` bot tương tác): **0 ReferenceError**.
+> - `test_track_math.mjs` (12 bài kiểm tra hình học đường đua) & `sim_race.mjs` (80 trận mô phỏng AI): **pass toàn bộ**.
+> - `node server/tests/verify_server.mjs`: **`ALL E2E ASSERTIONS PASSED!`** (exit code `0`), xác minh đầy đủ HTTP/WS, nhiệm vụ, 17 danh hiệu, lịch đua trâu 10 phút, `duatrau-done`, `mob-kill` + cooldown, `yt-add`/`yt-next`/`yt-disco` đồng bộ phòng & lưu `players.json` / `world.json`.
