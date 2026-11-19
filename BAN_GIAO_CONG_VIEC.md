@@ -1,9 +1,9 @@
 # 📋 Tài liệu Bàn giao Công việc · Dự án `didenchua` (An Tự Duyên 3D)
 
-> **Thời điểm cập nhật:** `2026-11-18`  
-> **Repository:** `https://github.com/Bean2910/didenchua.git` (`main`)  
-> **Phiên bản client hiện hành:** `index.html` (`?v=2026111805`) · Đã đẩy code lên `origin/main`  
-> **Trạng thái tổng quan:** Toàn bộ Backend Node.js (`3.287` dòng), Frontend 3D Three.js (`client/assets/main-CPNz0KLo.js`), Trang quản trị `/admin`, và bộ kiểm thử E2E (`server/tests/verify_server.mjs`, `636` dòng) đã hoàn thiện và kiểm thử vượt qua toàn bộ.
+> **Thời điểm cập nhật:** `2026-11-19`  
+> **Repository:** `https://github.com/Bean2910/Bean2910.github.io.git` (`main`, hỗ trợ GitHub Pages tại `https://bean2910.github.io/`)  
+> **Phiên bản client hiện hành:** `client/index.html` (`?v=2026111905`) + entry root `index.html` & `.nojekyll`  
+> **Trạng thái tổng quan:** Chạy tương thích cả **GitHub Pages (Static + Solo Offline Fallback + `?server=wss://...`)** lẫn **Backend Node.js ([server/server.js](file:///D:/python/didenchua/server/server.js))**, module tách riêng [client/dj/](file:///D:/python/didenchua/client/dj/index.js), Trang quản trị `/admin`, và bộ kiểm thử E2E ([server/tests/verify_server.mjs](file:///D:/python/didenchua/server/tests/verify_server.mjs)) pass toàn bộ.
 
 ---
 
@@ -11,11 +11,20 @@
 
 ```text
 didenchua/
-├── client/                              # Frontend 3D Three.js (production bundle + assets tĩnh)
+├── .nojekyll                            # Tắt Jekyll build để GitHub Pages phục vụ file tĩnh trực tiếp
+├── index.html                           # Trang chuyển hướng /(root) -> ./client/ (giữ nguyên query ?phong / ?server)
+├── client/                              # Frontend 3D Three.js (đường dẫn tương đối ./ , không cần build lại)
 │   ├── assets/
-│   │   ├── main-CPNz0KLo.js             # Bundle JS chính đã tích hợp toàn bộ tính năng mới
+│   │   ├── main-CPNz0KLo.js             # Bundle JS chính + chế độ GitHub Pages Solo Fallback + ?server=wss://...
 │   │   ├── main-DWI8sA1o.css            # Stylesheet chính
 │   │   └── modulepreload-polyfill-B5Qt9EMX.js
+│   ├── dj/                              # Module tách riêng: Bàn DJ 3D + FxSound EQ + Nhảy theo nhạc
+│   │   ├── index.js                     # Facade điều phối DjFx (nạp URL tương đối qua import.meta.url)
+│   │   ├── fxsound-presets.js           # Preset Factory/Bonus (.fac parser/exporter, Q, 5..31 bands)
+│   │   ├── fxsound-dsp.js               # Bộ xử lý WebAudio DSP + Bàn DJ Deck phát MP3 (tự skip file lỗi)
+│   │   ├── fxsound-ui.js / .css         # Giao diện Studio Dark/Light + Mirrored Spectrum Visualizer
+│   │   ├── dj-booth.js                  # Mô hình Bàn DJ 3D + 10 cột VU LED + loa bass ngoài sân chùa
+│   │   └── dance-fx.js                  # Động tác Nhảy theo nhạc (J) cho người chơi, peer & Bot
 │   ├── draco/                           # Bộ giải mã WebAssembly Draco
 │   ├── icons/                           # Icon PWA
 │   ├── models/                          # 45 mô hình 3D (.glb)
@@ -27,7 +36,7 @@ didenchua/
 │   │   ├── sa_ngo_tinh.glb              # Đệ tử Sa Ngộ Tĩnh
 │   │   └── ... (39 model gốc của chùa: trau_*, rua_*, phap khi, linh vat, hoa sen...)
 │   ├── music/                           # Nhạc nền Chánh điện & kinh tụng (.mp3)
-│   ├── index.html                       # Đã gỡ Cloudflare telemetry · cache tag ?v=2026111805
+│   ├── index.html                       # Đã gỡ Cloudflare telemetry · cache tag ?v=2026111905
 │   └── package.json / vite.config.js
 │
 ├── server/                              # Backend Node.js + WebSocket (ws) + Admin GUI
@@ -41,12 +50,11 @@ didenchua/
 │   │   ├── players.json                 # Tài khoản & hồ sơ nhân vật lưu theo cid
 │   │   └── world.json                   # Trạng thái sân chùa, hoa đăng, Bảng vàng & Đài nhạc YouTube
 │   ├── tests/
-│   │   └── verify_server.mjs            # Bộ kiểm thử E2E HTTP + WebSocket + Admin API (636 dòng)
-│   ├── race_schedule.js                 # Bộ tính chu kỳ giải Đua Trâu theo giờ VN (88 dòng)
+│   │   └── verify_server.mjs            # Bộ kiểm thử E2E HTTP + WebSocket + Admin API
+│   ├── race_schedule.js                 # Bộ tính chu kỳ giải Đua Trâu theo giờ VN
 │   ├── package.json                     # Phụ thuộc: "ws": "^8.19.0" ("type": "module")
-│   └── server.js                        # Máy chủ HTTP + WebSocket (3.287 dòng)
+│   └── server.js                        # Máy chủ HTTP + WebSocket
 │
-├── capture/                             # Tài liệu phân tích giao thức / trạng thái tham khảo
 ├── run.bat                              # Script khởi động nhanh trên Windows (port 8080)
 ├── README.md
 └── BAN_GIAO_CONG_VIEC.md                # Tài liệu bàn giao này
@@ -86,7 +94,7 @@ didenchua/
   - Admin Tab 1 có card **Trường Đua Trâu Quanh Chùa (Bot AI)** hỗ trợ lưu config và nút **`🏁 Mở giải đua ngay`**.
 - **Các handler WebSocket mới đã tích hợp:**
   - `mob-kill`: Thưởng Công đức theo 9 ID quái (`imp_*` +5/12s, `beast_*` +10/18s, `boss_*` +20/28s cooldown phòng; Boss bậc 3 phát thông báo `ann` toàn phòng).
-  - `yt-add`, `yt-play`, `yt-next`, `yt-stop`, `yt-disco`: Validate ID YouTube 11 ký tự (`youtube.com/watch`, `youtu.be`, `shorts/`, `live/`, `embed/`), đồng bộ `yt-state` realtime cả phòng và lưu `world.json`; Admin `/api/admin/world` có `action: 'clear-yt'`.
+  - `yt-add`, `yt-play`, `yt-next`, `yt-stop`, `yt-remove`, `yt-clear`, `yt-disco`: Validate ID YouTube 11 ký tự (`youtube.com/watch`, `youtu.be`, `shorts/`, `live/`, `embed/`), thêm/phát/xóa bài đang chiếu, xóa từng bài trong hàng chờ hoặc dọn sạch danh sách, đồng bộ `yt-state` realtime cả phòng và lưu `world.json`; Admin `/api/admin/world` có `action: 'clear-yt'`.
   - `duatrau-done`: Ghi nhận hạng về đích & nhân hệ số thưởng theo độ khó (`de ×1`, `trungbinh ×1.5`, `kho ×2`, `cuckho ×3`).
   - `/api/pass` trả `{ off: true }` để chạy LAN/local không bị vướng Captcha.
 
@@ -119,9 +127,9 @@ didenchua/
 ### 3.6. Đài Nhạc YouTube 16:9, Quả Cầu Gương 7 Sắc Cầu Vồng, 28 Nệm Ngồi & Bot Sự Kiện (`YtFx`, `BotFx`)
 - **Đài nhạc YouTube 16:9 (`YtFx` tại `(16.2, 28.5)` trước cây Bồ Đề):**
   - Khung màn hình rộng chuẩn **`8.0m × 4.5m` (16:9)** nâng cao `1.10m`, chiếu video YouTube (`<iframe>`) **trực tiếp lên mặt bảng 3D ngoài sân chùa** theo góc nhìn camera thực qua CSS3D `sync3D(Pe)` (tự ẩn mặt lưng khi đứng sau bảng hoặc khi vào trong Chánh điện).
-  - Bảng điều khiển hỗ trợ dán link YouTube, **Phát ngay lên bảng**, **Thêm hàng chờ**, **Bài tiếp**, **Dừng phát**, **Thu nhỏ PiP** (không bị tải lại iframe khi chuyển giữa `world` ↔ `modal` ↔ `pip`).
+  - Bảng điều khiển hỗ trợ dán link YouTube, **Phát ngay lên bảng**, **Thêm hàng chờ**, **Bài tiếp**, **Dừng phát**, **Xóa bài đang phát / xóa từng bài trong hàng chờ / xóa sạch danh sách**, **Thu nhỏ PiP** (không bị tải lại iframe khi chuyển giữa `world` ↔ `modal` ↔ `pip`).
 - **Quả cầu gương Disco 7 sắc cầu vồng Gradient (`yt-disco`):**
-  - Treo trên giàn truss trước màn chiếu (`(16.2, 6.50, 33.9)`), phủ texture mosaic `36×18` ô kính + shader cầu vồng lấp lánh, **10 luồng tia ánh sáng gradient 7 sắc**, **144 đốm sáng phản chiếu (`InstancedMesh`)** xoay dưới sân & không gian xung quanh, cùng 2 `PointLight` đổi màu cầu vồng. Bật/tắt qua click trực tiếp quả cầu, nút HUD **`Quả cầu gương`**, hoặc trong modal YouTube.
+  - Treo trên giàn truss trước màn chiếu (`(16.2, 6.45, 33.9)`), phủ texture mosaic `48×24` ô kính + shader cầu vồng lấp lánh, **44 tia sáng mảnh 7 sắc mờ tự nhiên tỏa mọi hướng** (`_mkRaysGeo`, 1 draw call), **120 đốm sáng phản chiếu (`InstancedMesh`)** xoay dưới sân & không gian xung quanh, cùng 2 `PointLight` đổi màu cầu vồng. Bật/tắt qua click trực tiếp quả cầu, nút HUD **`Quả cầu gương`**, hoặc trong modal YouTube.
 - **28 nệm ngồi kiểu Chánh Điện (`cd-yt-0..cd-yt-27`):**
   - Xếp **4 hàng × 7 cột** ngay trước màn chiếu (`x = 11.4..21.0`, `z = 31.7..38.0`), click tới ngồi hướng mặt vào màn hình (`facing = Math.PI`), tính phút tĩnh tọa `sitMin`.
 - **7 Bot thiện tín (`BotFx`):**
@@ -133,7 +141,7 @@ didenchua/
 
 - **Cơ chế cập nhật `client/assets/main-CPNz0KLo.js`:**
   - Frontend sử dụng bản build bundle đã minify; mọi nâng cấp JS/CSS từ ngày 16–18/11 đều được áp dụng có kiểm soát thông qua script Node `replaceExact(...)` (lưu bản gốc tham chiếu tại thư mục scratch của phiên làm việc) kèm audit `'use strict'` để đảm bảo không trùng biến cục bộ minify (ví dụ tránh tên trùng như `Yc`, ưu tiên tiền tố module riêng `VkFx`, `DtFx`, `HmFx`, `MobFx`, `YtFx`, `BotFx`, `RaceSys`).
-  - Mỗi lần sửa bundle client cần tăng query cache-bust trong [client/index.html](file:///D:/python/didenchua/client/index.html) (hiện tại `?v=2026111805`) và cập nhật khớp trong `server/tests/verify_server.mjs`, sau đó nhắc người chơi nhấn **`Ctrl + F5`**.
+  - Mỗi lần sửa bundle client cần tăng query cache-bust trong [client/index.html](file:///D:/python/didenchua/client/index.html) (hiện tại `?v=2026111905`) và cập nhật khớp trong `server/tests/verify_server.mjs`, sau đó nhắc người chơi nhấn **`Ctrl + F5`**.
 
 ---
 
@@ -168,8 +176,8 @@ node --check server/tests/verify_server.mjs
 node server/tests/verify_server.mjs
 ```
 
-> **Kết quả kiểm thử gần nhất (`2026-11-18`):**
-> - `node --check` trên client bundle & backend server đều exit code `0`.
-> - Runtime audit `'use strict'` trên các module `RaceSys`, `DtFx`, `HmFx`, `MobFx`, `YtFx` (`16:9` + Mirror Ball 7 sắc cầu vồng gradient + `28` nệm ngồi `cd-yt-*`), `BotFx` (`7` bot tương tác): **0 ReferenceError**.
-> - `test_track_math.mjs` (12 bài kiểm tra hình học đường đua) & `sim_race.mjs` (80 trận mô phỏng AI): **pass toàn bộ**.
-> - `node server/tests/verify_server.mjs`: **`ALL E2E ASSERTIONS PASSED!`** (exit code `0`), xác minh đầy đủ HTTP/WS, nhiệm vụ, 17 danh hiệu, lịch đua trâu 10 phút, `duatrau-done`, `mob-kill` + cooldown, `yt-add`/`yt-next`/`yt-disco` đồng bộ phòng & lưu `players.json` / `world.json`.
+> **Kết quả kiểm thử gần nhất (`2026-11-19`):**
+> - `node --check` trên client bundle, `client/dj/*.js` & backend server đều exit code `0`.
+> - Kiểm thử GitHub Pages / đường dẫn tĩnh / Offline Solo Fallback (`test_gh_pages.mjs`): **pass toàn bộ**.
+> - Runtime audit `'use strict'` (`audit_racesys.mjs`), `test_fxsound_dj.mjs` (FxSound EQ + DJ Booth + Dance), `test_track_math.mjs` & `sim_race.mjs`: **pass toàn bộ**.
+> - `node server/tests/verify_server.mjs`: **`ALL E2E ASSERTIONS PASSED!`** (exit code `0`), xác minh đầy đủ HTTP/WS (`/client/`, `/dj/*`, `dance-*`), nhiệm vụ, 17 danh hiệu, lịch đua trâu 10 phút, `duatrau-done`, `mob-kill` + cooldown, `yt-add`/`yt-next`/`yt-remove`/`yt-clear`/`yt-disco` đồng bộ phòng & lưu `players.json` / `world.json`.

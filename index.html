@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#1d1610" />
+    <title>An Tự Duyên · Chùa online</title>
+    <meta http-equiv="refresh" content="0; url=./client/" />
+    <style>
+      html, body {
+        margin: 0;
+        height: 100%;
+        background: #1d1610;
+        color: #ffe69b;
+        font-family: system-ui, -apple-system, 'Be Vietnam Pro', sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+      .wrap { padding: 24px; max-width: 420px; }
+      h1 { margin: 0 0 8px; font-size: 22px; color: #ffd978; }
+      p { margin: 6px 0; color: #e7d7bd; font-size: 14px; line-height: 1.5; }
+      a { color: #6ff7ff; font-weight: 600; }
+    </style>
+    <script>
+      (function () {
+        var q = window.location.search || '';
+        var h = window.location.hash || '';
+        window.location.replace('./client/' + q + h);
+      })();
+    </script>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>An Tự Duyên</h1>
+      <p>Đang mở cổng chùa trên GitHub Pages…</p>
+      <p><a id="go" href="./client/">Nhấn vào đây nếu trình duyệt không tự chuyển</a></p>
+    </div>
+    <script>
+      var el = document.getElementById('go');
+      if (el) el.href = './client/' + (window.location.search || '') + (window.location.hash || '');
+    </script>
+  </body>
+</html>

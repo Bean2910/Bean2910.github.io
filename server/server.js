@@ -785,6 +785,7 @@ class Player {
     this.flying = false;
     this.dtMask = 0;
     this.maOn = 0;
+    this.dance = '';
     this.lastSeen = Date.now();
     this.lastMoMeritAt = 0;
     this.lastRaceAt = 0;
@@ -853,7 +854,8 @@ class Player {
       s: this.s,
       fly: this.flying ? 1 : 0,
       dt: this.dtMask || 0,
-      ma: this.maOn || 0
+      ma: this.maOn || 0,
+      dance: this.dance || ''
     };
   }
 
@@ -2081,7 +2083,11 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  let safePath = path.normalize(pathname).replace(/^(\.\.[/\\])+/, '');
+  let reqPath = pathname;
+  if (reqPath === '/client' || reqPath.startsWith('/client/')) {
+    reqPath = reqPath.slice(7) || '/';
+  }
+  let safePath = path.normalize(reqPath).replace(/^(\.\.[/\\])+/, '');
   if (safePath === '/' || safePath === '\\') {
     safePath = '/index.html';
   }
@@ -2404,6 +2410,11 @@ wss.on('connection', (ws, req) => {
         }
         if (msg.e === 'ma-1' || msg.e === 'ma-0') {
           player.maOn = msg.e === 'ma-1' ? 1 : 0;
+        }
+        if (msg.e === 'dance-off') {
+          player.dance = '';
+        } else if (typeof msg.e === 'string' && /^dance-(dj|zen|spin)$/.test(msg.e)) {
+          player.dance = msg.e.slice(6);
         }
         if (msg.e === 'lay') {
           player.rec.bows += 1;
@@ -3156,6 +3167,48 @@ wss.on('connection', (ws, req) => {
             ? `🪩 ${player.rec.name} vừa BẬT Quả cầu gương chiếu sáng trước Đài nhạc YouTube!`
             : `🪩 ${player.rec.name} vừa TẮT Quả cầu gương sân chùa.`
         });
+        break;
+      }
+
+      case 'yt-remove': {
+        const room = player.room;
+        if (!room) break;
+        const nowTs = Date.now();
+        if (nowTs - player.lastYtAt < 350) break;
+        player.lastYtAt = nowTs;
+        let changed = false;
+        if (msg.current || (msg.id && room.yt.current?.id === msg.id)) {
+          if (room.yt.current) {
+            const nxt = room.yt.queue.shift() || null;
+            room.yt.current = nxt ? { ...nxt, startedAt: nowTs } : null;
+            changed = true;
+          }
+        } else if (msg.id) {
+          const before = room.yt.queue.length;
+          room.yt.queue = room.yt.queue.filter((x) => x.id !== msg.id);
+          changed = room.yt.queue.length !== before;
+        }
+        if (changed) {
+          scheduleSave();
+          room.broadcast(buildYtPayload(room));
+        }
+        break;
+      }
+
+      case 'yt-clear': {
+        const room = player.room;
+        if (!room) break;
+        const nowTs = Date.now();
+        if (nowTs - player.lastYtAt < 500) break;
+        player.lastYtAt = nowTs;
+        if (msg.scope === 'queue') {
+          room.yt.queue = [];
+        } else {
+          room.yt.current = null;
+          room.yt.queue = [];
+        }
+        scheduleSave();
+        room.broadcast(buildYtPayload(room));
         break;
       }
 

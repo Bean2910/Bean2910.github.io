@@ -11,9 +11,3 @@ server/data/*.json
 .DS_Store
 Thumbs.db
 .env
-
-# Reverse-engineering trace/tool scratch logs
-build-activity.log
-feed.json
-transcript.json
-usage.json

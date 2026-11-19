@@ -141,13 +141,23 @@ try {
   assert.equal(htmlRes.headers.get('cache-control'), 'no-cache');
   assert.equal((await fetch(`http://127.0.0.1:${PORT}/sw.js`)).status, 404);
   const htmlText = await htmlRes.text();
-  assert.ok(htmlText.includes('main-CPNz0KLo.js?v=2026111805'));
-  const jsRes = await fetch(`http://127.0.0.1:${PORT}/assets/main-CPNz0KLo.js?v=2026111805`);
+  assert.ok(htmlText.includes('./assets/main-CPNz0KLo.js?v=2026111905'));
+  assert.ok(htmlText.includes('./dj/fxsound-ui.css?v=2026111905'));
+  const clientAliasRes = await fetch(`http://127.0.0.1:${PORT}/client/`);
+  assert.equal(clientAliasRes.status, 200);
+  const jsRes = await fetch(`http://127.0.0.1:${PORT}/assets/main-CPNz0KLo.js?v=2026111905`);
   assert.equal(jsRes.status, 200);
   assert.equal(jsRes.headers.get('cache-control'), 'no-cache');
   const jsText = await jsRes.text();
   assert.ok(jsText.includes('freeLook'));
   assert.ok(jsText.includes('RaceSys'));
+  assert.ok(jsText.includes('DjFx'));
+  assert.ok(jsText.includes('_resolveServerCfg'));
+  assert.ok(jsText.includes('handleOffline'));
+  for (const djPath of ['/dj/index.js', '/dj/fxsound-presets.js', '/dj/fxsound-dsp.js', '/dj/fxsound-ui.js', '/dj/fxsound-ui.css', '/dj/dj-booth.js', '/dj/dance-fx.js']) {
+    const r = await fetch(`http://127.0.0.1:${PORT}${djPath}`);
+    assert.equal(r.status, 200, `Expected 200 for ${djPath}`);
+  }
   assert.ok(jsText.includes('_rtGenMap'));
   assert.ok(jsText.includes('_rtHitLogs'));
   assert.ok(jsText.includes('_rtInPuddle'));
@@ -583,12 +593,52 @@ try {
   const ytDiscoAnn = await cRace.waitFor((m) => m.t === 'ann' && m.k === 'yt' && m.text?.includes('Quả cầu gương'));
   assert.ok(ytDiscoAnn.text.includes('BẬT'));
 
-  // Joining Chua-1 receives current yt state inside welcome packet; Chua-2 has independent yt queue
+  // Test deleting queued item & deleting current playing item + clear all ('yt-remove', 'yt-clear')
+  await new Promise((r) => setTimeout(r, 1250));
+  cA2.msgs = cA2.msgs.filter((m) => m.t !== 'yt-state');
+  cA2.send({ t: 'yt-add', url: 'https://www.youtube.com/watch?v=9bZkp7q19f0', title: 'Xóa Thử 1', playNow: false });
+  const ytAddedDel = await cA2.waitFor((m) => m.t === 'yt-state' && m.queue?.some((x) => x.videoId === '9bZkp7q19f0'));
+  const delTarget = ytAddedDel.queue.find((x) => x.videoId === '9bZkp7q19f0');
+  await new Promise((r) => setTimeout(r, 450));
+  cA2.msgs = cA2.msgs.filter((m) => m.t !== 'yt-state');
+  cA2.send({ t: 'yt-remove', id: delTarget.id });
+  const ytRemovedQ = await cA2.waitFor((m) => m.t === 'yt-state' && !m.queue?.some((x) => x.id === delTarget.id));
+  assert.equal(ytRemovedQ.queue.length, 1);
+  await new Promise((r) => setTimeout(r, 450));
+  cRace.msgs = cRace.msgs.filter((m) => m.t !== 'yt-state');
+  cA2.send({ t: 'yt-remove', current: true, id: ytRemovedQ.current?.id });
+  const ytRemovedCur = await cRace.waitFor((m) => m.t === 'yt-state' && m.current?.videoId === 'dQw4w9WgXcQ');
+  assert.equal(ytRemovedCur.queue.length, 0);
+
+  // Test clearing and re-adding one item to confirm cleanup works cleanly before persistence check
+  await new Promise((r) => setTimeout(r, 600));
+  cA2.msgs = cA2.msgs.filter((m) => m.t !== 'yt-state');
+  cA2.send({ t: 'yt-clear', scope: 'all' });
+  const ytCleared = await cA2.waitFor((m) => m.t === 'yt-state' && !m.current && m.queue.length === 0);
+  assert.equal(ytCleared.current, null);
+  await new Promise((r) => setTimeout(r, 1250));
+  cA2.msgs = cA2.msgs.filter((m) => m.t !== 'yt-state');
+  cA2.send({ t: 'yt-add', url: 'https://youtu.be/jNQXAC9IVRw', title: 'Chuông Chùa Sáng Sớm', playNow: true });
+  await cA2.waitFor((m) => m.t === 'yt-state' && m.current?.videoId === 'jNQXAC9IVRw');
+  await new Promise((r) => setTimeout(r, 1250));
+  cA2.msgs = cA2.msgs.filter((m) => m.t !== 'yt-state');
+  cRace.send({ t: 'yt-add', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', title: 'Nhạc Thiền An Lạc', playNow: false });
+  await cA2.waitFor((m) => m.t === 'yt-state' && m.queue?.length === 1);
+
+  // Test Dance emote broadcast + state sync in welcome packet
+  cA2.send({ t: 'emote', e: 'dance-dj' });
+  const danceEmote = await cRace.waitFor((m) => m.t === 'emote' && m.e === 'dance-dj');
+  assert.equal(danceEmote.e, 'dance-dj');
+
+  // Joining Chua-1 receives current yt state & active dancer inside welcome packet; Chua-2 has independent yt queue
   const cYtJoin = new TestClient();
   await cYtJoin.connect();
   cYtJoin.send({ t: 'hello', v: 2, cid: 'test-cid-yt-001', name: 'Nghe Nhạc', room: 'chua-1' });
   const ytWelcome = await cYtJoin.waitFor((m) => m.t === 'welcome');
   assert.equal(ytWelcome.yt?.current?.videoId, 'jNQXAC9IVRw');
+  assert.ok(ytWelcome.peers?.some((p) => p.dance === 'dj'));
+  cA2.send({ t: 'emote', e: 'dance-off' });
+  await cRace.waitFor((m) => m.t === 'emote' && m.e === 'dance-off');
   cYtJoin.send({ t: 'room-go', room: 'chua-2' });
   const ytRoom2 = await cYtJoin.waitFor((m) => m.t === 'room' && m.room === 'chua-2');
   assert.equal(ytRoom2.yt?.current, null);

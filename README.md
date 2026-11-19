@@ -11,13 +11,16 @@ Dự án clone hoàn chỉnh game 3D **Đi Đến Chùa** (`https://didenchua.on
 
 ```
 didenchua/
-├── client/                     # FRONTEND (Giao diện 3D & Trình duyệt)
-│   ├── assets/                 # Bundle JS, CSS chính của game
+├── index.html                  # Trang chuyển hướng vào ./client/ cho GitHub Pages (Folder: /(root))
+├── .nojekyll                    # Tắt xử lý Jekyll để GitHub Pages phục vụ file tĩnh trực tiếp
+├── client/                     # FRONTEND (Giao diện 3D & Trình duyệt — đường dẫn tương đối ./ )
+│   ├── assets/                 # Bundle JS, CSS chính của game (hỗ trợ cả GitHub Pages Solo & WS)
+│   ├── dj/                     # Module Bàn DJ 3D, FxSound EQ DSP & Động tác nhảy theo nhạc
 │   ├── draco/                  # WebAssembly decoder giải nén 3D mesh tốc độ cao
 │   ├── icons/                  # PWA Icons chùa
-│   ├── models/                 # 39 mô hình 3D .glb (Phật Thích Ca, Bồ Tát, La Hán, chùa, cây bồ đề, trâu, rùa...)
+│   ├── models/                 # 45 mô hình 3D .glb (Phật Thích Ca, Bồ Tát, La Hán, Bạch Long Mã, 3 Đệ Tử, Siêu Xe...)
 │   ├── music/                  # Nhạc chánh điện & bài tụng kinh (A Di Đà, Bát Nhã, Đại Bi, Vãng Sanh...)
-│   ├── index.html              # Trang chủ (đã gỡ bỏ Cloudflare telemetry tracker)
+│   ├── index.html              # Trang chủ game (đã gỡ Cloudflare telemetry, hỗ trợ ?server=wss://...)
 │   ├── manifest.webmanifest    # Cấu hình PWA
 │   ├── package.json            # Cấu hình Vite dev server (tuỳ chọn)
 │   └── vite.config.js          # Proxy tự động sang backend port 8080
@@ -26,15 +29,29 @@ didenchua/
 │   ├── admin/                  # Trang quản trị web (/admin)
 │   ├── data/                   # Dữ liệu lưu trữ bền vững (players.json, world.json, config.json)
 │   ├── node_modules/           # Thư viện phụ thuộc (cục bộ chỉ trong server)
+│   ├── tests/                  # Bộ kiểm thử E2E verify_server.mjs
+│   ├── race_schedule.js        # Bộ tính lịch giải Đua Trâu theo giờ VN
 │   ├── package.json            # Cấu hình dự án backend
 │   └── server.js               # Máy chủ siêu nhẹ Node.js + WebSocket (ws)
 │
+├── run.bat                     # Script chạy nhanh trên Windows
+├── BAN_GIAO_CONG_VIEC.md       # Tài liệu bàn giao chi tiết
 └── README.md                   # Hướng dẫn chi tiết
 ```
 
 ---
 
-## 2. Vì sao sử dụng Node.js làm Backend?
+## 2. Chạy trên GitHub Pages (Static + Chế độ Solo / Kết nối Server ngoài)
+
+Repo đã được cấu hình sẵn để chạy trực tiếp với **GitHub Pages** (`https://github.com/Bean2910/Bean2910.github.io.git`, `Branch: main`, `Folder: /(root)` -> **`https://bean2910.github.io/`**):
+
+- Mở `https://bean2910.github.io/` tự động chuyển hướng vào `./client/` (giữ nguyên tham số `?phong=...` hoặc `?server=...`).
+- Vì GitHub Pages chỉ phục vụ file tĩnh (không chạy Node.js), client tự kích hoạt **Chế độ Solo Offline** khi chạy trên `*.github.io`: toàn bộ thế giới 3D, **Đài nhạc YouTube 16:9** (lưu cục bộ trên trình duyệt), **Quả cầu gương 7 sắc**, **Bàn DJ FxSound EQ**, **Động tác nhảy theo nhạc (J)**, **Đua Trâu / Bạch Long Mã / Siêu Xe**, **Cưỡi Hạc bay tự do**, **7 Bot tương tác** đều hoạt động đầy đủ.
+- Nếu muốn chơi Multiplayer online từ GitHub Pages với backend Node.js (`server/`) host riêng (Render/Railway/VPS/ngrok...), truyền thêm `?server=wss://ten-mien-server` hoặc bấm mục **Máy chủ** trong game để dán URL server.
+
+---
+
+## 3. Vì sao sử dụng Node.js làm Backend?
 
 - **Siêu nhẹ & Tiết kiệm tài nguyên:** Server viết bằng Node.js với thư viện `ws` chuẩn hiệu năng cao, chỉ chiếm **~25MB RAM** khi hoạt động.
 - **Mượt mà & Độ trễ cực thấp:** Cơ chế Non-blocking Event Loop xử lý hàng nghìn kết nối WebSocket đồng thời mà không bị giật lag, độ trễ phản hồi < 1ms.
@@ -43,9 +60,9 @@ didenchua/
 
 ---
 
-## 3. Cách chạy Game
+## 4. Cách chạy Local Full Multiplayer
 
-Nếu vừa clone từ GitHub (`https://github.com/Bean2910/didenchua.git`), cài phụ thuộc cục bộ cho `server/` trước:
+Nếu vừa clone từ GitHub (`https://github.com/Bean2910/Bean2910.github.io.git`), cài phụ thuộc cục bộ cho `server/` trước:
 
 ```powershell
 cd server
