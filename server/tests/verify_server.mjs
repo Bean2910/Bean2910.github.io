@@ -141,11 +141,11 @@ try {
   assert.equal(htmlRes.headers.get('cache-control'), 'no-cache');
   assert.equal((await fetch(`http://127.0.0.1:${PORT}/sw.js`)).status, 404);
   const htmlText = await htmlRes.text();
-  assert.ok(htmlText.includes('./assets/main-CPNz0KLo.js?v=2026111905'));
-  assert.ok(htmlText.includes('./dj/fxsound-ui.css?v=2026111905'));
+  assert.ok(htmlText.includes('./assets/main-CPNz0KLo.js?v=2026111906'));
+  assert.ok(htmlText.includes('./dj/fxsound-ui.css?v=2026111906'));
   const clientAliasRes = await fetch(`http://127.0.0.1:${PORT}/client/`);
   assert.equal(clientAliasRes.status, 200);
-  const jsRes = await fetch(`http://127.0.0.1:${PORT}/assets/main-CPNz0KLo.js?v=2026111905`);
+  const jsRes = await fetch(`http://127.0.0.1:${PORT}/assets/main-CPNz0KLo.js?v=2026111906`);
   assert.equal(jsRes.status, 200);
   assert.equal(jsRes.headers.get('cache-control'), 'no-cache');
   const jsText = await jsRes.text();
@@ -625,18 +625,27 @@ try {
   cRace.send({ t: 'yt-add', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', title: 'Nhạc Thiền An Lạc', playNow: false });
   await cA2.waitFor((m) => m.t === 'yt-state' && m.queue?.length === 1);
 
-  // Test Dance emote broadcast + state sync in welcome packet
+  // Test Dance emote broadcast + Race mount sync (lv-cuoi veh: 'sieuxe' / 'ngua' / 'trau') in both live broadcast & welcome packet
   cA2.send({ t: 'emote', e: 'dance-dj' });
   const danceEmote = await cRace.waitFor((m) => m.t === 'emote' && m.e === 'dance-dj');
   assert.equal(danceEmote.e, 'dance-dj');
+  cRace.send({ t: 'lv-cuoi', on: 1, veh: 'sieuxe' });
+  const rideCar = await cA2.waitFor((m) => m.t === 'lv-cuoi' && m.on === 1 && m.veh === 'sieuxe');
+  assert.equal(rideCar.veh, 'sieuxe');
 
-  // Joining Chua-1 receives current yt state & active dancer inside welcome packet; Chua-2 has independent yt queue
+  // Joining Chua-1 receives current yt state, active dancer, AND active race mount inside welcome packet; Chua-2 has independent yt queue
   const cYtJoin = new TestClient();
   await cYtJoin.connect();
   cYtJoin.send({ t: 'hello', v: 2, cid: 'test-cid-yt-001', name: 'Nghe Nhạc', room: 'chua-1' });
   const ytWelcome = await cYtJoin.waitFor((m) => m.t === 'welcome');
   assert.equal(ytWelcome.yt?.current?.videoId, 'jNQXAC9IVRw');
   assert.ok(ytWelcome.peers?.some((p) => p.dance === 'dj'));
+  assert.ok(ytWelcome.peers?.some((p) => p.ride === 1 && p.veh === 'sieuxe'), 'Joining peer must receive active racer vehicle in welcome.peers');
+  cRace.send({ t: 'lv-cuoi', on: 1, veh: 'ngua' });
+  const rideHorse = await cA2.waitFor((m) => m.t === 'lv-cuoi' && m.veh === 'ngua');
+  assert.equal(rideHorse.on, 1);
+  cRace.send({ t: 'lv-cuoi', on: 0, veh: '' });
+  await cA2.waitFor((m) => m.t === 'lv-cuoi' && m.on === 0);
   cA2.send({ t: 'emote', e: 'dance-off' });
   await cRace.waitFor((m) => m.t === 'emote' && m.e === 'dance-off');
   cYtJoin.send({ t: 'room-go', room: 'chua-2' });

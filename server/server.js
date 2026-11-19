@@ -788,6 +788,8 @@ class Player {
     this.s = 0;
     this.seat = null;
     this.flying = false;
+    this.riding = false;
+    this.raceVeh = '';
     this.dtMask = 0;
     this.maOn = 0;
     this.dance = '';
@@ -858,6 +860,8 @@ class Player {
       ry: this.ry,
       s: this.s,
       fly: this.flying ? 1 : 0,
+      ride: this.riding ? 1 : 0,
+      veh: this.raceVeh || '',
       dt: this.dtMask || 0,
       ma: this.maOn || 0,
       dance: this.dance || ''
@@ -2415,6 +2419,10 @@ wss.on('connection', (ws, req) => {
         }
         if (msg.e === 'ma-1' || msg.e === 'ma-0') {
           player.maOn = msg.e === 'ma-1' ? 1 : 0;
+          if (player.maOn) {
+            player.riding = false;
+            player.raceVeh = '';
+          }
         }
         if (msg.e === 'dance-off') {
           player.dance = '';
@@ -2996,8 +3004,13 @@ wss.on('connection', (ws, req) => {
       }
 
       case 'lv-cuoi': {
-        if (msg.on) player.maOn = 0;
-        player.room?.broadcast({ t: 'lv-cuoi', id: player.id, on: msg.on ? 1 : 0 }, player.id);
+        const on = msg.on ? 1 : 0;
+        const rawVeh = typeof msg.veh === 'string' ? msg.veh.trim() : '';
+        const veh = on ? (['trau', 'ngua', 'sieuxe'].includes(rawVeh) ? rawVeh : 'trau') : '';
+        player.riding = Boolean(on);
+        player.raceVeh = veh;
+        if (on) player.maOn = 0;
+        player.room?.broadcast({ t: 'lv-cuoi', id: player.id, on, veh }, player.id);
         break;
       }
 
@@ -3009,7 +3022,11 @@ wss.on('connection', (ws, req) => {
       case 'lv-bay': {
         const on = (msg.on !== undefined ? Boolean(msg.on) : Boolean(msg.k)) ? 1 : 0;
         player.flying = Boolean(on);
-        if (on) player.maOn = 0;
+        if (on) {
+          player.maOn = 0;
+          player.riding = false;
+          player.raceVeh = '';
+        }
         player.room?.broadcast({ t: 'lv-bay', id: player.id, on }, player.id);
         break;
       }

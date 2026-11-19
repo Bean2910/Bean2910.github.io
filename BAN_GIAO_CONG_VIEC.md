@@ -2,7 +2,7 @@
 
 > **Thời điểm cập nhật:** `2026-11-19`  
 > **Repository:** `https://github.com/Bean2910/Bean2910.github.io.git` (`main`, hỗ trợ GitHub Pages tại `https://bean2910.github.io/`)  
-> **Phiên bản client hiện hành:** `client/index.html` (`?v=2026111905`) + entry root `index.html` & `.nojekyll`  
+> **Phiên bản client hiện hành:** `client/index.html` (`?v=2026111906`) + entry root `index.html` & `.nojekyll`  
 > **Trạng thái tổng quan:** Chạy tương thích cả **GitHub Pages (Static + Solo Offline Fallback + `?server=wss://...`)** lẫn **Backend Node.js ([server/server.js](file:///D:/python/didenchua/server/server.js))**, module tách riêng [client/dj/](file:///D:/python/didenchua/client/dj/index.js), Trang quản trị `/admin`, và bộ kiểm thử E2E ([server/tests/verify_server.mjs](file:///D:/python/didenchua/server/tests/verify_server.mjs)) pass toàn bộ.
 
 ---
@@ -141,7 +141,7 @@ didenchua/
 
 - **Cơ chế cập nhật `client/assets/main-CPNz0KLo.js`:**
   - Frontend sử dụng bản build bundle đã minify; mọi nâng cấp JS/CSS từ ngày 16–18/11 đều được áp dụng có kiểm soát thông qua script Node `replaceExact(...)` (lưu bản gốc tham chiếu tại thư mục scratch của phiên làm việc) kèm audit `'use strict'` để đảm bảo không trùng biến cục bộ minify (ví dụ tránh tên trùng như `Yc`, ưu tiên tiền tố module riêng `VkFx`, `DtFx`, `HmFx`, `MobFx`, `YtFx`, `BotFx`, `RaceSys`).
-  - Mỗi lần sửa bundle client cần tăng query cache-bust trong [client/index.html](file:///D:/python/didenchua/client/index.html) (hiện tại `?v=2026111905`) và cập nhật khớp trong `server/tests/verify_server.mjs`, sau đó nhắc người chơi nhấn **`Ctrl + F5`**.
+  - Mỗi lần sửa bundle client cần tăng query cache-bust trong [client/index.html](file:///D:/python/didenchua/client/index.html) (hiện tại `?v=2026111906`) và cập nhật khớp trong `server/tests/verify_server.mjs`, sau đó nhắc người chơi nhấn **`Ctrl + F5`**.
 
 ---
 
