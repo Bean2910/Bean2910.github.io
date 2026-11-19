@@ -110,9 +110,11 @@ const FESTIVAL_PRESETS = {
   }
 };
 
+const ENV_ADMIN_PIN = typeof process.env.ADMIN_PIN === 'string' ? process.env.ADMIN_PIN.trim().slice(0, 64) : '';
+
 function getDefaultConfig() {
   return {
-    adminPin: '',
+    adminPin: ENV_ADMIN_PIN,
     linhVatSessionCooldown: true,
     allowFreeCraneAnytime: true,
     buffaloRace: {
@@ -589,6 +591,9 @@ function normalizeConfig(raw = {}) {
 }
 
 let gameConfig = normalizeConfig(readJsonSafe(CONFIG_FILE, {}));
+if (ENV_ADMIN_PIN) {
+  gameConfig.adminPin = ENV_ADMIN_PIN;
+}
 if (!fs.existsSync(CONFIG_FILE)) {
   writeJsonAtomic(CONFIG_FILE, gameConfig);
 }
