@@ -1,0 +1,362 @@
+/* Khu An Uong Chay · Tiec Chay 12h00 & 18h00 UI */
+
+.veg-pill {
+  position: absolute;
+  top: calc(calc(max(14px, env(safe-area-inset-top)) + var(--mq, 0px)) + 62px);
+  right: calc(14px + env(safe-area-inset-right));
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  max-width: min(360px, calc(100vw - 28px));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-radius: 999px;
+  border: 1px solid rgba(233, 194, 122, 0.35);
+  background: rgba(30, 24, 16, 0.68);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #fff3dc;
+  font-family: "Be Vietnam Pro", system-ui, sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 0.16s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+}
+
+.veg-pill:hover {
+  transform: translateY(-1px);
+  border-color: rgba(233, 194, 122, 0.72);
+}
+
+.veg-pill.live {
+  background: linear-gradient(135deg, rgba(132, 62, 18, 0.88), rgba(66, 38, 16, 0.88));
+  border-color: #f3c46b;
+  color: #ffe8b5;
+  box-shadow: 0 0 18px rgba(243, 196, 107, 0.42), 0 4px 14px rgba(0, 0, 0, 0.36);
+  animation: veg-pulse 2.2s ease-in-out infinite;
+}
+
+.veg-pill-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #8fd16f;
+  flex: none;
+}
+
+.veg-pill.live .veg-pill-dot {
+  background: #ffd66b;
+  box-shadow: 0 0 8px #ffd66b;
+}
+
+.veg-pill b {
+  color: #ffd98a;
+  font-weight: 600;
+}
+
+@keyframes veg-pulse {
+  0%, 100% { box-shadow: 0 0 14px rgba(243, 196, 107, 0.32), 0 4px 12px rgba(0, 0, 0, 0.32); }
+  50% { box-shadow: 0 0 24px rgba(243, 196, 107, 0.65), 0 4px 16px rgba(0, 0, 0, 0.4); }
+}
+
+@media (max-width: 520px) {
+  .veg-pill {
+    font-size: 11px;
+    padding: 5px 10px;
+    max-width: calc(100vw - 28px);
+  }
+}
+
+@media (max-height: 500px) {
+  .veg-pill {
+    top: calc(calc(max(10px, env(safe-area-inset-top)) + var(--mq, 0px)) + 52px);
+  }
+}
+
+/* Modal */
+.veg-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 31;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  background: rgba(12, 9, 6, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  pointer-events: auto;
+  font-family: "Be Vietnam Pro", system-ui, sans-serif;
+}
+
+.veg-modal.open {
+  display: flex;
+}
+
+.veg-card {
+  width: min(760px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #2b1f15, #1d150f);
+  border: 1px solid rgba(233, 194, 122, 0.34);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.72);
+  color: #fff4df;
+  padding: 18px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.veg-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.veg-title-wrap h2 {
+  margin: 0;
+  font-family: "Lora", Georgia, serif;
+  font-size: 20px;
+  color: #f3c877;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.veg-title-wrap p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: rgba(255, 244, 223, 0.72);
+  line-height: 1.4;
+}
+
+.veg-close {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 236, 200, 0.12);
+  color: #fff4df;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  flex: none;
+}
+
+.veg-close:hover {
+  background: rgba(255, 236, 200, 0.24);
+}
+
+.veg-status-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 236, 200, 0.06);
+  border: 1px solid rgba(233, 194, 122, 0.22);
+}
+
+.veg-status-box.live {
+  background: linear-gradient(135deg, rgba(162, 82, 24, 0.38), rgba(114, 138, 62, 0.22));
+  border-color: rgba(243, 196, 107, 0.6);
+}
+
+.veg-status-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.veg-status-main strong {
+  font-size: 14.5px;
+  color: #ffd98a;
+}
+
+.veg-status-main span {
+  font-size: 12.5px;
+  color: rgba(255, 244, 223, 0.8);
+}
+
+.veg-status-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.veg-btn {
+  height: 38px;
+  padding: 0 15px;
+  border-radius: 999px;
+  border: 1px solid rgba(233, 194, 122, 0.38);
+  background: rgba(255, 236, 200, 0.08);
+  color: #fff4df;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.veg-btn:hover {
+  background: rgba(233, 194, 122, 0.18);
+  border-color: #e9c27a;
+}
+
+.veg-btn.primary {
+  border: 0;
+  background: linear-gradient(180deg, #dfb059, #b97d2f);
+  color: #261608;
+  font-weight: 600;
+}
+
+.veg-btn.primary:hover {
+  filter: brightness(1.07);
+}
+
+.veg-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.veg-slots-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 12.5px;
+  color: rgba(255, 244, 223, 0.78);
+}
+
+.veg-dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.veg-dots i {
+  width: 24px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 236, 200, 0.16);
+  display: inline-block;
+}
+
+.veg-dots i.on {
+  background: linear-gradient(90deg, #98d86b, #f1c468);
+  box-shadow: 0 0 8px rgba(241, 196, 104, 0.45);
+}
+
+.veg-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: 10px;
+}
+
+.veg-dish {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255, 236, 200, 0.05);
+  border: 1px solid rgba(255, 236, 200, 0.14);
+  cursor: pointer;
+  transition: transform 0.14s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.veg-dish:hover {
+  transform: translateY(-2px);
+  border-color: rgba(233, 194, 122, 0.55);
+  background: rgba(255, 236, 200, 0.09);
+}
+
+.veg-dish.selected {
+  border-color: #f3c46b;
+  background: rgba(233, 194, 122, 0.14);
+  box-shadow: 0 0 0 1px rgba(243, 196, 107, 0.35);
+}
+
+.veg-dish.eaten {
+  border-color: rgba(143, 209, 111, 0.55);
+  background: rgba(143, 209, 111, 0.09);
+}
+
+.veg-dish-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.veg-dish-ico {
+  font-size: 26px;
+  line-height: 1;
+}
+
+.veg-dish-badge {
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: rgba(233, 194, 122, 0.16);
+  color: #f4cc7b;
+}
+
+.veg-dish.eaten .veg-dish-badge {
+  background: rgba(143, 209, 111, 0.22);
+  color: #9fe084;
+}
+
+.veg-dish h3 {
+  margin: 0;
+  font-family: "Lora", Georgia, serif;
+  font-size: 14.5px;
+  color: #fff6e5;
+}
+
+.veg-dish p {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: rgba(255, 244, 223, 0.7);
+}
+
+.veg-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  border-top: 1px solid rgba(255, 236, 200, 0.12);
+  padding-top: 10px;
+}
+
+.veg-foot-note {
+  font-size: 12px;
+  color: rgba(255, 244, 223, 0.72);
+  line-height: 1.4;
+  flex: 1;
+  min-width: 220px;
+}
+
+@media (max-width: 520px) {
+  .veg-card {
+    padding: 14px 14px 16px;
+  }
+  .veg-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+}

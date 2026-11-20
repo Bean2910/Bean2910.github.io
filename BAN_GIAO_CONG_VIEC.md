@@ -2,7 +2,7 @@
 
 > **Thời điểm cập nhật:** `2026-11-19`  
 > **Repository:** `https://github.com/Bean2910/Bean2910.github.io.git` (`main`, hỗ trợ GitHub Pages tại `https://bean2910.github.io/`)  
-> **Phiên bản client hiện hành:** `client/index.html` (`?v=2026111906`) + entry root `index.html` & `.nojekyll`  
+> **Phiên bản client hiện hành:** `client/index.html` (`?v=2026112001`) + entry root `index.html` & `.nojekyll`  
 > **Trạng thái tổng quan:** Chạy tương thích cả **GitHub Pages (Static + Solo Offline Fallback + `?server=wss://...`)** lẫn **Backend Node.js ([server/server.js](file:///D:/python/didenchua/server/server.js))**, module tách riêng [client/dj/](file:///D:/python/didenchua/client/dj/index.js), Trang quản trị `/admin`, và bộ kiểm thử E2E ([server/tests/verify_server.mjs](file:///D:/python/didenchua/server/tests/verify_server.mjs)) pass toàn bộ.
 
 ---
@@ -135,13 +135,20 @@ didenchua/
 - **7 Bot thiện tín (`BotFx`):**
   - Tự tìm nệm ngồi xem chiếu (tối đa 6 bot ngồi đồng thời, luôn chừa ≥22 nệm cho người chơi), phản ứng & trò chuyện bong bóng chat khi có bài YouTube mới, bật/tắt Quả cầu gương, diệt quái/Boss, người mới vào/lên cấp, dùng động tác gần bot, và tự kéo ra cổ vũ gần cổng Tây khi sắp/đang Đua trâu.
 
+### 3.7. Âm thanh Không gian 3D & Khu Ăn Uống (`VegFx` · Tiệc Chay 12h00 & 18h00)
+- **Âm thanh không gian 3D (`Je.spatial`, mặc định bật):**
+  - Khoảng cách tới Bàn DJ (`(8.4, 32.0)`), Đài YouTube (`(16.2, 28.5)`), Chánh điện (`(0, -10)`), Chuông chùa (`(-15, 52)`) tự động chỉnh âm lượng xa nhỏ – gần to + stereo pan trái/phải theo góc camera, đồng bộ công tắc trong tab Âm thanh.
+- **Khu Ăn Uống (`client/chay/`, trung tâm `(39, 70)` bên cạnh Tháp nghỉ chân & Vườn hoa dâng Phật):**
+  - **Không gian 3D:** Cổng vòm lối vào có biển 2 mặt & đèn lồng, thềm lát đá đối xứng trục `z = 70`, **1 Trai Đường chính + 2 Chòi Mái Che cong 2 bên**, Quầy Tiệc Chay 2 nồi đồng bốc khói, **8 bàn gỗ (`32` ghế ngồi `chay-t0-0..chay-t7-3`)** bày đầy đủ **8 món chay 3D** (*Bún Huế Chay*, *Cơm Sen Lá Bồ Đề*, *Bánh Bao Chay Ngũ Sắc*, *Nem & Chả Giò Chay*, *Đậu Hũ Kho Nấm Rơm*, *Lẩu Nấm Trường Thọ*, *Trà Sen Cung Đình*, *Chè Hạt Sen & Ngũ Quả*).
+  - **Lịch Tiệc Chay 12h00 & 18h00 (`server/veg_feast.js`):** Tự động mở theo giờ VN (`UTC+7`, mặc định 60 phút mỗi ca `12h00–13h00` & `18h00–19h00`), khóa thọ trai & nhận Công đức khi chưa đến giờ mở tiệc, phát thông báo nhắc trước 5 phút / 1 phút và khi khai mở, thưởng **`+15 Công đức`** cho tối đa `3` món khác nhau mỗi ca tiệc (tổng `+45 Công đức`), danh hiệu mới **`Thiện thực Tịnh tâm`** (5 lần dự tiệc), hỗ trợ nút mở/đóng thử ngay trong `/admin` và chế độ Solo.
+
 ---
 
 ## 4. Lưu ý kỹ thuật khi phát triển & bảo trì tiếp
 
 - **Cơ chế cập nhật `client/assets/main-CPNz0KLo.js`:**
-  - Frontend sử dụng bản build bundle đã minify; mọi nâng cấp JS/CSS từ ngày 16–18/11 đều được áp dụng có kiểm soát thông qua script Node `replaceExact(...)` (lưu bản gốc tham chiếu tại thư mục scratch của phiên làm việc) kèm audit `'use strict'` để đảm bảo không trùng biến cục bộ minify (ví dụ tránh tên trùng như `Yc`, ưu tiên tiền tố module riêng `VkFx`, `DtFx`, `HmFx`, `MobFx`, `YtFx`, `BotFx`, `RaceSys`).
-  - Mỗi lần sửa bundle client cần tăng query cache-bust trong [client/index.html](file:///D:/python/didenchua/client/index.html) (hiện tại `?v=2026111906`) và cập nhật khớp trong `server/tests/verify_server.mjs`, sau đó nhắc người chơi nhấn **`Ctrl + F5`**.
+  - Frontend sử dụng bản build bundle đã minify; mọi nâng cấp JS/CSS từ ngày 16–20/11 đều được áp dụng có kiểm soát thông qua script Node / module rời (`client/dj/`, `client/chay/`) kèm audit `'use strict'` để đảm bảo không trùng biến cục bộ minify.
+  - Mỗi lần sửa bundle client cần tăng query cache-bust trong [client/index.html](file:///D:/python/didenchua/client/index.html) (hiện tại `?v=2026112002`) và cập nhật khớp trong `server/tests/verify_server.mjs`, sau đó nhắc người chơi nhấn **`Ctrl + F5`**.
 
 ---
 
@@ -167,7 +174,9 @@ npm install
 ```powershell
 # 1. Kiểm tra cú pháp JS (exit code 0)
 node --check client/assets/main-CPNz0KLo.js
+node --check client/chay/index.js
 node --check server/server.js
+node --check server/veg_feast.js
 node --check server/admin/admin.js
 node --check server/race_schedule.js
 node --check server/tests/verify_server.mjs
@@ -176,8 +185,8 @@ node --check server/tests/verify_server.mjs
 node server/tests/verify_server.mjs
 ```
 
-> **Kết quả kiểm thử gần nhất (`2026-11-19`):**
-> - `node --check` trên client bundle, `client/dj/*.js` & backend server đều exit code `0`.
+> **Kết quả kiểm thử gần nhất (`2026-11-20`):**
+> - `node --check` trên client bundle, `client/dj/*.js`, `client/chay/index.js` & backend server đều exit code `0`.
 > - Kiểm thử GitHub Pages / đường dẫn tĩnh / Offline Solo Fallback (`test_gh_pages.mjs`): **pass toàn bộ**.
-> - Runtime audit `'use strict'` (`audit_racesys.mjs`), `test_fxsound_dj.mjs` (FxSound EQ + DJ Booth + Dance), `test_track_math.mjs` & `sim_race.mjs`: **pass toàn bộ**.
-> - `node server/tests/verify_server.mjs`: **`ALL E2E ASSERTIONS PASSED!`** (exit code `0`), xác minh đầy đủ HTTP/WS (`/client/`, `/dj/*`, `dance-*`), nhiệm vụ, 17 danh hiệu, lịch đua trâu 10 phút, `duatrau-done`, `mob-kill` + cooldown, `yt-add`/`yt-next`/`yt-remove`/`yt-clear`/`yt-disco` đồng bộ phòng & lưu `players.json` / `world.json`.
+> - Runtime audit `'use strict'` (`audit_racesys.mjs`), `test_veg_chay.mjs`, `test_fxsound_dj.mjs`, `test_track_math.mjs` & `sim_race.mjs`: **pass toàn bộ**.
+> - `node server/tests/verify_server.mjs`: **`ALL E2E ASSERTIONS PASSED!`** (exit code `0`), xác minh đầy đủ HTTP/WS (`/client/`, `/dj/*`, `/chay/*`, `veg-eat`, `dance-*`), nhiệm vụ, 18 danh hiệu, lịch đua trâu 10 phút, lịch Tiệc Chay 12h00 & 18h00, `duatrau-done`, `mob-kill` + cooldown, `yt-*` đồng bộ phòng & lưu `players.json` / `world.json`.

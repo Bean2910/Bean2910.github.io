@@ -43,7 +43,7 @@ export const DjFx = (() => {
     if (!ui) {
       ui = new FxSoundUI(dsp, {
         hudRoot: deps.hudRoot || document.body,
-        cssUrl: new URL('./fxsound-ui.css?v=2026111905', import.meta.url).href,
+        cssUrl: new URL('./fxsound-ui.css?v=2026112002', import.meta.url).href,
         ensureAudio: () => {
           deps.ensureAudio?.();
           if (deps.audioRegistry) dsp.flushRegistry(deps.audioRegistry);
@@ -78,11 +78,47 @@ export const DjFx = (() => {
     return dsp.attachContext(ctx) || ctx.destination;
   }
 
-  function update(elapsed) {
+  function _calcSpatial(opt) {
+    if (!opt || opt.muted) return { gain: opt?.muted ? 0 : 1, pan: 0 };
+    if (opt.spatial === false || !opt.listenerPos) return { gain: 1, pan: 0 };
+    const lx = opt.listenerPos.x || 0;
+    const lz = opt.listenerPos.z || 0;
+    const dx = DJ_POS.x - lx;
+    const dz = DJ_POS.z - lz;
+    const dist = Math.hypot(dx, dz);
+    const minD = 12;
+    const maxD = 62;
+    const floor = 0.05;
+    let gain = 1;
+    if (dist > minD) {
+      if (dist >= maxD) gain = floor;
+      else {
+        const u = (dist - minD) / (maxD - minD);
+        gain = floor + (1 - floor) * Math.pow(1 - u, 1.85);
+      }
+    }
+    if (opt.indoor) gain *= 0.25;
+    if (ui?.isOpen) gain = Math.max(gain, 0.78);
+    let pan = 0;
+    const m = opt.camera?.matrixWorldInverse?.elements;
+    if (m && dist >= 0.8) {
+      const rx = m[0];
+      const rz = m[8];
+      const rLen = Math.hypot(rx, rz) || 1;
+      pan = (((dx / dist) * rx + (dz / dist) * rz) / rLen) * Math.min(1, dist / 6);
+    }
+    return { gain, pan: Math.max(-0.82, Math.min(0.82, pan)) };
+  }
+
+  function update(elapsed, spatialOpt) {
     const dt = lastT ? Math.min(0.05, Math.max(0.001, elapsed - lastT)) : 0.016;
     lastT = elapsed;
     if (depsRef?.audioRegistry?.length) {
       dsp.flushRegistry(depsRef.audioRegistry);
+    }
+    if (spatialOpt) {
+      const sp = _calcSpatial(spatialOpt);
+      dsp.setSpatial(sp.gain, sp.pan);
     }
     dance.tick(dt, Boolean(depsRef?.isDiscoOn?.()));
     booth?.update(elapsed, dt);

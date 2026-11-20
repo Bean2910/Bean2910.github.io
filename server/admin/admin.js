@@ -23,6 +23,8 @@ const REWARD_LABELS = {
   petFeed: 'Chăm sóc tiểu thú',
   linhVatStep: 'Mỗi bước Linh Vật',
   linhVatBond: 'Hoàn tất kết duyên Linh Vật',
+  vegFeast: 'Dự Tiệc Chay (12h00 / 18h00 · mỗi món)',
+  vegTaste: 'Nếm món chay ngoài giờ (mỗi ngày)',
   weekly6Bonus: 'Thưởng đạt 6/9 việc tuần'
 };
 
@@ -132,6 +134,11 @@ function renderAll(resetInputs = false) {
     $('#raceIntervalMinInput').value = rc.intervalMin ?? 10;
     $('#raceAutoScheduleToggle').checked = rc.autoSchedule !== false;
     $('#raceAmbientBotsToggle').checked = rc.ambientBots !== false;
+    const vf = config.vegFeast || { enabled: true, hours: [12, 18], durationMin: 60, maxDishesPerSlot: 3 };
+    $('#vegEnabledToggle').checked = vf.enabled !== false;
+    $('#vegHoursInput').value = Array.isArray(vf.hours) ? vf.hours.join(', ') : '12, 18';
+    $('#vegDurationInput').value = vf.durationMin ?? 60;
+    $('#vegMaxDishesInput').value = vf.maxDishesPerSlot ?? 3;
     renderFestivalForm();
     renderRewardsGrid();
   }
@@ -159,6 +166,18 @@ function renderOverviewStats() {
     else if (rs) {
       const m = Math.floor(rs.remSec / 60), s = rs.remSec % 60;
       rsEl.textContent = `Giải định kỳ kế tiếp: ${rs.nextLabel} (còn ${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}) · Nhắc toàn chùa lúc 3p / 2p / 1p.`;
+    }
+  }
+  const vs = appState.meta?.vegFeastState;
+  const vsEl = $('#vegSchedMeta');
+  if (vsEl && vs) {
+    if (!vs.enabled) vsEl.textContent = 'Khu Tiệc Chay định kỳ đang tạm tắt.';
+    else if (vs.isOpen) {
+      const m = Math.floor(vs.remSec / 60), s = vs.remSec % 60;
+      vsEl.textContent = `🟢 ĐANG MỞ: ${vs.activeLabel} (còn ${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}) · +${vs.meritPerDish || 0} CĐ/món (tối đa ${vs.maxDishesPerSlot} món/ca).`;
+    } else {
+      const h = Math.floor(vs.nextInSec / 3600), m = Math.floor((vs.nextInSec % 3600) / 60);
+      vsEl.textContent = `⏳ Đang chờ đến giờ tiệc (${vs.hoursText}) · Tiệc tiếp theo: ${vs.nextLabel} (còn ${h}g ${String(m).padStart(2, '0')}p).`;
     }
   }
   $('#overviewStats').innerHTML = `
@@ -713,6 +732,51 @@ $('#triggerRaceNowBtn')?.addEventListener('click', async () => {
     appState = res.state;
     renderAll(false);
     showToast('Đã phát động giải đua trâu toàn chùa!');
+  } catch (err) { showToast(err.message, true); }
+});
+
+$('#saveVegConfigBtn')?.addEventListener('click', async () => {
+  const enabled = $('#vegEnabledToggle').checked;
+  const hours = $('#vegHoursInput').value
+    .split(/[\s,;]+/)
+    .map((v) => Number(v.trim()))
+    .filter((n) => Number.isInteger(n) && n >= 0 && n <= 23);
+  const durationMin = Math.max(5, Math.min(180, Number($('#vegDurationInput').value) || 60));
+  const maxDishesPerSlot = Math.max(1, Math.min(8, Number($('#vegMaxDishesInput').value) || 3));
+  try {
+    const res = await api('/api/admin/config', {
+      method: 'POST',
+      body: JSON.stringify({
+        config: { vegFeast: { enabled, hours: hours.length ? hours : [12, 18], durationMin, maxDishesPerSlot } }
+      })
+    });
+    appState = res.state;
+    renderAll(true);
+    showToast('Đã lưu cấu hình lịch Tiệc Chay!');
+  } catch (err) { showToast(err.message, true); }
+});
+
+$('#triggerVegOpenBtn')?.addEventListener('click', async () => {
+  try {
+    const res = await api('/api/admin/world', {
+      method: 'POST',
+      body: JSON.stringify({ room: 'all', action: 'trigger-veg-open', durationMin: Number($('#vegDurationInput')?.value) || 60 })
+    });
+    appState = res.state;
+    renderAll(false);
+    showToast('Đã khai mở Tiệc Chay toàn chùa!');
+  } catch (err) { showToast(err.message, true); }
+});
+
+$('#triggerVegCloseBtn')?.addEventListener('click', async () => {
+  try {
+    const res = await api('/api/admin/world', {
+      method: 'POST',
+      body: JSON.stringify({ room: 'all', action: 'trigger-veg-close' })
+    });
+    appState = res.state;
+    renderAll(false);
+    showToast('Đã kết thúc phiên Tiệc Chay thử.');
   } catch (err) { showToast(err.message, true); }
 });
 

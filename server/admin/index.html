@@ -175,6 +175,39 @@
         </div>
       </div>
 
+      <div class="card" style="margin-top:16px;">
+        <div class="card-head">
+          <h2>🍲 Khu Ăn Uống · Lịch Tiệc Chay (12h00 &amp; 18h00)</h2>
+          <label class="switch">
+            <input type="checkbox" id="vegEnabledToggle" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <p class="muted" style="margin-bottom:10px;">
+          Tự động mở Tiệc Chay theo giờ Việt Nam (mặc định 12h00 &amp; 18h00) tại góc sân vườn hoa. Người chơi dự tiệc trong khung giờ sẽ được cộng Công đức theo từng món!
+        </p>
+        <div class="grid-3 compact">
+          <div class="form-group">
+            <label>Các khung giờ mở tiệc (VN 0–23h, cách nhau dấu phẩy)</label>
+            <input id="vegHoursInput" type="text" value="12, 18" placeholder="12, 18" />
+          </div>
+          <div class="form-group">
+            <label>Thời lượng mỗi tiệc (phút, 5–180)</label>
+            <input id="vegDurationInput" type="number" min="5" max="180" value="60" />
+          </div>
+          <div class="form-group">
+            <label>Số món nhận Công đức / ca tiệc (1–8)</label>
+            <input id="vegMaxDishesInput" type="number" min="1" max="8" value="3" />
+          </div>
+        </div>
+        <div class="muted" id="vegSchedMeta" style="margin-top:8px;">Trạng thái Tiệc Chay: --</div>
+        <div class="row gap" style="margin-top:10px;flex-wrap:wrap;">
+          <button id="saveVegConfigBtn" class="btn primary" type="button">Lưu lịch Tiệc Chay</button>
+          <button id="triggerVegOpenBtn" class="btn gold" type="button">🍲 Mở Tiệc Chay ngay</button>
+          <button id="triggerVegCloseBtn" class="btn warn" type="button">⏹ Đóng Tiệc thử</button>
+        </div>
+      </div>
+
       <div class="grid-2" style="margin-top:16px;">
         <div class="card">
           <div class="card-head">

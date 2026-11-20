@@ -4,6 +4,7 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { computeRaceSlot, createRaceTracker, evaluateRaceTick } from '../race_schedule.js';
+import { computeVegFeastStatus, createVegFeastTracker, evaluateVegFeastTick } from '../veg_feast.js';
 
 const require = createRequire('D:/python/didenchua/server/package.json');
 const { WebSocket } = require('ws');
@@ -133,6 +134,23 @@ try {
   }
   assert.equal(computeRaceSlot(mkVnMs(11, 0, 0), { intervalMin: 10 }).curLabel, '11h00');
 
+  // 0b. Pure 12h00 & 18h00 VN Vegetarian Feast schedule unit checks
+  assert.equal(computeVegFeastStatus(mkVnMs(11, 55, 0)).isOpen, false);
+  assert.equal(computeVegFeastStatus(mkVnMs(11, 55, 0)).warnMin, 5);
+  assert.equal(computeVegFeastStatus(mkVnMs(12, 0, 0)).isOpen, true);
+  assert.equal(computeVegFeastStatus(mkVnMs(12, 0, 0)).activeLabel, 'Tiệc Chay 12h00');
+  assert.equal(computeVegFeastStatus(mkVnMs(12, 59, 59)).isOpen, true);
+  assert.equal(computeVegFeastStatus(mkVnMs(13, 0, 0)).isOpen, false);
+  assert.equal(computeVegFeastStatus(mkVnMs(13, 0, 0)).nextLabel, '18h00');
+  assert.equal(computeVegFeastStatus(mkVnMs(18, 15, 0)).isOpen, true);
+  assert.equal(computeVegFeastStatus(mkVnMs(18, 15, 0)).activeLabel, 'Tiệc Chay 18h00');
+  assert.equal(computeVegFeastStatus(mkVnMs(19, 0, 0)).isOpen, false);
+  assert.equal(computeVegFeastStatus(mkVnMs(19, 0, 0)).nextLabel, '12h00');
+  const vTrk = createVegFeastTracker(mkVnMs(11, 50, 0));
+  assert.equal(evaluateVegFeastTick(vTrk, mkVnMs(11, 55, 0)).event, 'warn');
+  assert.equal(evaluateVegFeastTick(vTrk, mkVnMs(12, 0, 0)).event, 'start');
+  assert.equal(evaluateVegFeastTick(vTrk, mkVnMs(13, 0, 0)).event, 'end');
+
   // 1. Check HTTP endpoints + Admin GUI static assets & state API
   const passRes = await fetch(`http://127.0.0.1:${PORT}/api/pass`).then((r) => r.json());
   assert.deepEqual(passRes, { off: true });
@@ -141,19 +159,26 @@ try {
   assert.equal(htmlRes.headers.get('cache-control'), 'no-cache');
   assert.equal((await fetch(`http://127.0.0.1:${PORT}/sw.js`)).status, 404);
   const htmlText = await htmlRes.text();
-  assert.ok(htmlText.includes('./assets/main-CPNz0KLo.js?v=2026111906'));
-  assert.ok(htmlText.includes('./dj/fxsound-ui.css?v=2026111906'));
+  assert.ok(htmlText.includes('./assets/main-CPNz0KLo.js?v=2026112002'));
+  assert.ok(htmlText.includes('./dj/fxsound-ui.css?v=2026112002'));
+  assert.ok(htmlText.includes('./chay/chay-ui.css?v=2026112003'));
   const clientAliasRes = await fetch(`http://127.0.0.1:${PORT}/client/`);
   assert.equal(clientAliasRes.status, 200);
-  const jsRes = await fetch(`http://127.0.0.1:${PORT}/assets/main-CPNz0KLo.js?v=2026111906`);
+  const jsRes = await fetch(`http://127.0.0.1:${PORT}/assets/main-CPNz0KLo.js?v=2026112002`);
   assert.equal(jsRes.status, 200);
   assert.equal(jsRes.headers.get('cache-control'), 'no-cache');
   const jsText = await jsRes.text();
   assert.ok(jsText.includes('freeLook'));
   assert.ok(jsText.includes('RaceSys'));
   assert.ok(jsText.includes('DjFx'));
+  assert.ok(jsText.includes('VegFx'));
+  assert.ok(jsText.includes('Khu ăn uống'));
   assert.ok(jsText.includes('_resolveServerCfg'));
   assert.ok(jsText.includes('handleOffline'));
+  for (const vegPath of ['/chay/index.js', '/chay/chay-ui.css']) {
+    const r = await fetch(`http://127.0.0.1:${PORT}${vegPath}`);
+    assert.equal(r.status, 200, `Expected 200 for ${vegPath}`);
+  }
   for (const djPath of ['/dj/index.js', '/dj/fxsound-presets.js', '/dj/fxsound-dsp.js', '/dj/fxsound-ui.js', '/dj/fxsound-ui.css', '/dj/dj-booth.js', '/dj/dance-fx.js']) {
     const r = await fetch(`http://127.0.0.1:${PORT}${djPath}`);
     assert.equal(r.status, 200, `Expected 200 for ${djPath}`);
@@ -453,18 +478,18 @@ try {
   const meritAfterLe = await cA2.waitFor((m) => m.t === 'merit' && m.me?.total === 286);
   assert.equal(meritAfterLe.me.total, 286);
 
-  // Test unlocking all 17 titles via Admin API -> pushes journal & hanhtrinh live with 17/17 unlocked
-  const all17Ids = adminInit.meta.titles.map((t) => t.id);
-  assert.equal(all17Ids.length, 17);
+  // Test unlocking all 18 titles via Admin API -> pushes journal & hanhtrinh live with 18/18 unlocked
+  const all18Ids = adminInit.meta.titles.map((t) => t.id);
+  assert.equal(all18Ids.length, 18);
   await fetch(`http://127.0.0.1:${PORT}/api/admin/player/update`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ cid: cidA, patch: { unlockedTitles: all17Ids, title: 'nguyen_lanh' } })
+    body: JSON.stringify({ cid: cidA, patch: { unlockedTitles: all18Ids, title: 'nguyen_lanh' } })
   });
-  const jAll17 = await cA2.waitFor((m) => m.t === 'journal' && m.j?.titles?.filter((t) => t.got).length === 17);
-  assert.equal(jAll17.j.title, 'nguyen_lanh');
-  const htAll17 = await cA2.waitFor((m) => m.t === 'hanhtrinh' && m.titles?.filter((t) => t.got).length === 17);
-  assert.equal(htAll17.titles.filter((t) => t.got).length, 17);
+  const jAll18 = await cA2.waitFor((m) => m.t === 'journal' && m.j?.titles?.filter((t) => t.got).length === 18);
+  assert.equal(jAll18.j.title, 'nguyen_lanh');
+  const htAll18 = await cA2.waitFor((m) => m.t === 'hanhtrinh' && m.titles?.filter((t) => t.got).length === 18);
+  assert.equal(htAll18.titles.filter((t) => t.got).length, 18);
 
   // Live Quiz API test
   await fetch(`http://127.0.0.1:${PORT}/api/admin/quiz`, {
@@ -655,6 +680,57 @@ try {
   await cRace.close();
 
   await cA2.close();
+
+  // 14. Veg Feast E2E: trigger-veg-open, veg-eat merit reward, duplicate guard & slot cap, close & persistence
+  const cidVeg = 'test-cid-veg-001';
+  const cVeg = new TestClient();
+  await cVeg.connect();
+  cVeg.send({ t: 'hello', v: 2, cid: cidVeg, name: 'Thực Khách Chay', room: 'chua-1' });
+  const vegWelcome = await cVeg.waitFor((m) => m.t === 'welcome');
+  assert.ok(vegWelcome.vegFeast && Array.isArray(vegWelcome.vegFeast.hours));
+
+  const openVegRes = await fetch(`http://127.0.0.1:${PORT}/api/admin/world`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ room: 'all', action: 'trigger-veg-open', durationMin: 30 })
+  }).then((r) => r.json());
+  assert.equal(openVegRes.ok, true);
+  assert.equal(openVegRes.state.meta.vegFeastState.isOpen, true);
+  const vegPushOpen = await cVeg.waitFor((m) => m.t === 'veg-feast' && m.vegFeast?.isOpen === true);
+  assert.equal(vegPushOpen.vegFeast.meritPerDish, 15);
+
+  cVeg.send({ t: 'veg-eat', dish: 'bun_hue' });
+  const vegM1 = await cVeg.waitFor((m) => m.t === 'merit' && m.me?.total === 15);
+  assert.equal(vegM1.me.total, 15);
+  const vegEat1 = await cVeg.waitFor((m) => m.t === 'veg-eat' && m.dish === 'bun_hue' && m.feastRewarded === true);
+  assert.equal(vegEat1.meritGained, 15);
+
+  // Duplicate same dish in same feast slot awards 0 extra merit
+  cVeg.send({ t: 'veg-eat', dish: 'bun_hue' });
+  const vegDup = await cVeg.waitFor((m) => m.t === 'veg-eat' && m.dish === 'bun_hue' && m.feastRewarded === false);
+  assert.equal(vegDup.meritGained, 0);
+
+  // Eat 2 more distinct dishes (total 3/3 = +45 merit), 4th distinct dish gets capped at 0 extra
+  cVeg.send({ t: 'veg-eat', dish: 'lau_nam' });
+  await cVeg.waitFor((m) => m.t === 'merit' && m.me?.total === 30);
+  cVeg.send({ t: 'veg-eat', dish: 'com_sen' });
+  const vegM3 = await cVeg.waitFor((m) => m.t === 'merit' && m.me?.total === 45);
+  assert.equal(vegM3.me.total, 45);
+  cVeg.send({ t: 'veg-eat', dish: 'tra_sen' });
+  const vegCap = await cVeg.waitFor((m) => m.t === 'veg-eat' && m.dish === 'tra_sen');
+  assert.equal(vegCap.feastRewarded, false);
+
+  const closeVegRes = await fetch(`http://127.0.0.1:${PORT}/api/admin/world`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ room: 'all', action: 'trigger-veg-close' })
+  }).then((r) => r.json());
+  if (closeVegRes.state?.meta?.vegFeastState?.isOpen === false) {
+    cVeg.send({ t: 'veg-eat', dish: 'dau_hu' });
+    const lockNotice = await cVeg.waitFor((m) => m.t === 'notice' && m.text?.includes('Chưa đến giờ'));
+    assert.ok(lockNotice.text.includes('Tiệc Chay'));
+  }
+  await cVeg.close();
   await new Promise((r) => setTimeout(r, 250));
 
   // Shutdown & verify disk persistence file written
@@ -664,9 +740,11 @@ try {
   const savedDisk = JSON.parse(fs.readFileSync(PLAYERS_FILE, 'utf8'));
   assert.equal(savedDisk.characters[cidA].merit, 286); // 241 + 5 incense + 40 le reward
   assert.equal(savedDisk.characters[cidA].title, 'nguyen_lanh');
-  assert.equal(savedDisk.characters[cidA].unlockedTitles.length, 17);
+  assert.equal(savedDisk.characters[cidA].unlockedTitles.length, 18);
   assert.equal(savedDisk.characters[cidB].merit, 0);
   assert.equal(savedDisk.characters[cidRace].merit, 70); // 45 race + 5 imp + 20 boss
+  assert.equal(savedDisk.characters[cidVeg].merit, 45);
+  assert.equal(savedDisk.characters[cidVeg].vegMeals, 3);
   assert.equal(savedDisk.accounts['nangxanh'], cidA);
   const savedWorld = JSON.parse(fs.readFileSync(WORLD_FILE, 'utf8'));
   assert.equal(savedWorld.rooms['chua-1']?.yt?.current?.videoId, 'jNQXAC9IVRw');

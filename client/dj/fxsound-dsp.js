@@ -57,12 +57,15 @@ export class FxSoundDsp {
     this.deckEl = null;
     this.deckMediaNode = null;
     this.deckGainNode = null;
+    this.deckPannerNode = null;
     this.deckTracks = [];
     this.deckIndex = 0;
     this.deckCustomName = '';
     this.deckBlobUrl = '';
     this.deckPlaying = false;
     this.deckVolume = 0.85;
+    this.spatialGain = 1;
+    this.spatialPan = 0;
     this.deckRate = 1.0;
     this.deckLoop = false;
     this.deckSolo = true;
@@ -646,11 +649,29 @@ export class FxSoundDsp {
       try {
         this.deckMediaNode = this.ctx.createMediaElementSource(this.deckEl);
         this.deckGainNode = this.ctx.createGain();
-        this.deckGainNode.gain.value = this.deckVolume;
-        this.deckMediaNode.connect(this.deckGainNode).connect(this.inputNode);
+        this.deckGainNode.gain.value = Math.max(0, Math.min(1.5, this.deckVolume * this.spatialGain));
+        if (typeof this.ctx.createStereoPanner === 'function') {
+          this.deckPannerNode = this.ctx.createStereoPanner();
+          this.deckPannerNode.pan.value = this.spatialPan;
+          this.deckMediaNode.connect(this.deckGainNode).connect(this.deckPannerNode).connect(this.inputNode);
+        } else {
+          this.deckMediaNode.connect(this.deckGainNode).connect(this.inputNode);
+        }
       } catch {
         // Fallback if already attached
       }
+    }
+  }
+
+  _applyDeckGain() {
+    const g = Math.max(0, Math.min(1.5, this.deckVolume * this.spatialGain));
+    if (this.deckGainNode && this.ctx) {
+      this.deckGainNode.gain.setTargetAtTime(g, this.ctx.currentTime, 0.03);
+      if (this.deckPannerNode) {
+        this.deckPannerNode.pan.setTargetAtTime(this.spatialPan, this.ctx.currentTime, 0.04);
+      }
+    } else if (this.deckEl) {
+      this.deckEl.volume = Math.min(1, g);
     }
   }
 
@@ -723,12 +744,17 @@ export class FxSoundDsp {
 
   setDeckVolume(v) {
     this.deckVolume = Math.max(0, Math.min(1.5, Number(v) || 0));
-    if (this.deckGainNode && this.ctx) {
-      this.deckGainNode.gain.setTargetAtTime(this.deckVolume, this.ctx.currentTime, 0.02);
-    } else if (this.deckEl) {
-      this.deckEl.volume = Math.min(1, this.deckVolume);
-    }
+    this._applyDeckGain();
     this._emit();
+  }
+
+  setSpatial(gain = 1, pan = 0) {
+    const nextG = Math.max(0, Math.min(1.25, Number.isFinite(Number(gain)) ? Number(gain) : 1));
+    const nextP = Math.max(-0.9, Math.min(0.9, Number.isFinite(Number(pan)) ? Number(pan) : 0));
+    if (Math.abs(nextG - this.spatialGain) < 0.004 && Math.abs(nextP - this.spatialPan) < 0.01) return;
+    this.spatialGain = nextG;
+    this.spatialPan = nextP;
+    this._applyDeckGain();
   }
 
   setDeckRate(r) {

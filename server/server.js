@@ -5,6 +5,14 @@ import { fileURLToPath } from 'node:url';
 import crypto from 'node:crypto';
 import { WebSocketServer, WebSocket } from 'ws';
 import { computeRaceSlot, createRaceTracker, evaluateRaceTick, RACE_JOIN_WINDOW_SEC } from './race_schedule.js';
+import {
+  VEG_MENU,
+  DEFAULT_VEG_FEAST_CONFIG,
+  normalizeVegFeastConfig,
+  computeVegFeastStatus,
+  createVegFeastTracker,
+  evaluateVegFeastTick
+} from './veg_feast.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -37,6 +45,7 @@ const QUEST_ID_META = [
   { id: 'phongsinh', label: 'Cho cá ăn / Phóng sinh' },
   { id: 'xam', label: 'Gieo quẻ xăm' },
   { id: 'tuoi', label: 'Dâng hoa / Tưới vườn' },
+  { id: 'veg', label: 'Dự Tiệc Chay (12h00 · 18h00)' },
   { id: 'nmHuong', label: 'Người mới: Thắp hương' },
   { id: 'nmLay', label: 'Người mới: Lạy Phật' },
   { id: 'nmDen', label: 'Người mới: Lời nguyện / Hoa đăng' }
@@ -127,6 +136,10 @@ function getDefaultConfig() {
       intervalMin: 10,
       ambientBots: true
     },
+    vegFeast: {
+      ...DEFAULT_VEG_FEAST_CONFIG,
+      hours: [...DEFAULT_VEG_FEAST_CONFIG.hours]
+    },
     rewards: {
       incense: 5,
       sanIncense: 5,
@@ -152,6 +165,8 @@ function getDefaultConfig() {
       petFeed: 3,
       linhVatStep: 10,
       linhVatBond: 30,
+      vegFeast: 15,
+      vegTaste: 3,
       weekly6Bonus: 100
     },
     questsConfig: {
@@ -221,7 +236,8 @@ const TITLE_DEFS = [
   { id: 'quet_la', name: 'Quét sạch bụi trần', desc: 'Quét lá sân chùa 10 lần', check: (p) => p.sweepCount >= 10 },
   { id: 'tu_bi', name: 'Từ bi hỷ xả', desc: 'Cho cá và chim ăn 20 lần', check: (p) => p.feedCount >= 20 },
   { id: 'thien_duyen', name: 'Thiện duyên', desc: 'Kết duyên cùng bạn đồng tu', check: (p) => Boolean(p.duyen) },
-  { id: 'nguyen_lanh', name: 'Nguyện lành', desc: 'Gửi 10 lời nguyện dâng Phật', check: (p) => p.vowCount >= 10 }
+  { id: 'nguyen_lanh', name: 'Nguyện lành', desc: 'Gửi 10 lời nguyện dâng Phật', check: (p) => p.vowCount >= 10 },
+  { id: 'an_chay', name: 'Thiện thực Tịnh tâm', desc: 'Tham gia Tiệc Chay 5 lần', check: (p) => (p.vegMeals || 0) >= 5 }
 ];
 
 const PHAPKHI_DEFS = [
@@ -452,6 +468,10 @@ function createDefaultRecord(cid, msgLook = {}) {
     feedCount: 0,
     vowCount: 0,
     quizCount: 0,
+    vegMeals: 0,
+    vegSlotKey: '',
+    vegSlotDishes: [],
+    vegTastedDay: '',
     tkDone: false,
     chores: defaultChores(),
     quests: createDailyQuests(),
@@ -567,11 +587,14 @@ function normalizeConfig(raw = {}) {
     ambientBots: rawRace.ambientBots !== undefined ? Boolean(rawRace.ambientBots) : def.buffaloRace.ambientBots
   };
 
+  const vegFeast = normalizeVegFeastConfig(raw.vegFeast);
+
   return {
     adminPin: typeof raw.adminPin === 'string' ? raw.adminPin.trim().slice(0, 64) : def.adminPin,
     linhVatSessionCooldown: raw.linhVatSessionCooldown !== undefined ? Boolean(raw.linhVatSessionCooldown) : def.linhVatSessionCooldown,
     allowFreeCraneAnytime: raw.allowFreeCraneAnytime !== undefined ? Boolean(raw.allowFreeCraneAnytime) : def.allowFreeCraneAnytime,
     buffaloRace,
+    vegFeast,
     rewards,
     questsConfig,
     festival: {
@@ -613,6 +636,64 @@ function broadcastRaceScheduleEvent(event, slot, minsLeft = 0) {
     room.broadcast({ t: 'ann', k: 'admin', text });
     room.broadcast({ t: 'race-sched', phase: event, minsLeft, ...slot });
   }
+}
+
+const vegFeastTracker = createVegFeastTracker(Date.now(), gameConfig.vegFeast, TZ_OFFSET_MS);
+let vegManualOpenUntil = 0;
+let vegManualSlotId = 0;
+
+function syncRecordVegSlot(rec, status) {
+  if (!rec) return [];
+  if (!status?.isOpen) return [];
+  if (rec.vegSlotKey !== status.slotKey) {
+    rec.vegSlotKey = status.slotKey;
+    rec.vegSlotDishes = [];
+  }
+  if (!Array.isArray(rec.vegSlotDishes)) rec.vegSlotDishes = [];
+  return rec.vegSlotDishes;
+}
+
+function buildVegFeastPayload(rec = null, nowMs = Date.now()) {
+  const status = computeVegFeastStatus(nowMs, gameConfig.vegFeast, TZ_OFFSET_MS, vegManualOpenUntil, vegManualSlotId);
+  const eatenIds = rec && status.isOpen
+    ? (rec.vegSlotKey === status.slotKey && Array.isArray(rec.vegSlotDishes) ? [...rec.vegSlotDishes] : [])
+    : [];
+  const todayKey = getVnDateKey(nowMs);
+  return {
+    ...status,
+    meritPerDish: Math.max(0, Number(gameConfig.rewards?.vegFeast) || 0),
+    tasteMerit: Math.max(0, Number(gameConfig.rewards?.vegTaste) || 0),
+    eatenIds,
+    eatenCount: eatenIds.length,
+    remainingMeritSlots: status.isOpen ? Math.max(0, status.maxDishesPerSlot - eatenIds.length) : 0,
+    tastedToday: Boolean(rec && rec.vegTastedDay === todayKey),
+    totalMeals: Math.max(0, Number(rec?.vegMeals) || 0)
+  };
+}
+
+function broadcastVegFeastAll() {
+  const nowMs = Date.now();
+  for (const p of allPlayers.values()) {
+    p.send({ t: 'veg-feast', vegFeast: buildVegFeastPayload(p.rec, nowMs) });
+  }
+}
+
+function broadcastVegFeastEvent(event, status, minsLeft = 0) {
+  if (!event) return;
+  let text = '';
+  if (event === 'start') {
+    text = `🍲 ${status.activeLabel} đã chính thức khai mở! Mời quý vị ghé Khu Ăn Uống dùng bữa nhận Công đức!`;
+  } else if (event === 'warn') {
+    text = `🥢 Tiệc Chay lúc ${status.nextLabel} sắp mở sau ${minsLeft} phút tại Khu Ăn Uống!`;
+  } else if (event === 'end') {
+    text = `🙏 Tiệc Chay vừa khép lại viên mãn. Hẹn quý vị vào khung ${status.hoursText} (${status.nextLabel})!`;
+  }
+  if (text) {
+    for (const room of rooms.values()) {
+      room.broadcast({ t: 'ann', k: 'admin', text });
+    }
+  }
+  broadcastVegFeastAll();
 }
 
 function saveConfig() {
@@ -689,6 +770,10 @@ function normalizeRecord(rec) {
   merged.leProgress = rec.leProgress && typeof rec.leProgress === 'object' ? rec.leProgress : null;
   merged.quests = Array.isArray(rec.quests) && rec.quests.length ? rec.quests : createDailyQuests();
   merged.weekly = syncQuestPool(rec.weekly, createWeeklyQuests(), false);
+  merged.vegMeals = Math.max(0, Number(rec.vegMeals) || 0);
+  merged.vegSlotKey = typeof rec.vegSlotKey === 'string' ? rec.vegSlotKey : '';
+  merged.vegSlotDishes = Array.isArray(rec.vegSlotDishes) ? rec.vegSlotDishes.slice(0, 12) : [];
+  merged.vegTastedDay = typeof rec.vegTastedDay === 'string' ? rec.vegTastedDay : '';
   merged.lvTrau = { s: 0, deedToday: false, lastDate: '', lastW: -1, ...(rec.lvTrau || {}) };
   merged.lvHac = { s: 0, l: 0, lastDate: '', lastW: -1, ...(rec.lvHac || {}) };
   merged.lvRua = { s: 0, lastDate: '', lastW: -1, ...(rec.lvRua || {}) };
@@ -1497,7 +1582,8 @@ function sendWelcomeState(player, isNew) {
     hb: true,
     chores: player.rec.chores,
     donors: room.donors,
-    yt: buildYtPayload(room)
+    yt: buildYtPayload(room),
+    vegFeast: buildVegFeastPayload(player.rec)
   });
 
   player.send({ t: 'merit', me: player.getMeritData() });
@@ -1657,6 +1743,8 @@ function buildAdminState() {
       currentVnTime,
       vnHour: getVnHour(),
       raceSchedule: getCurrentRaceSlot(Date.now()),
+      vegFeastState: buildVegFeastPayload(null),
+      vegMenu: VEG_MENU,
       linhVatWindows: LINH_VAT_WINDOWS,
       linhVatSlotsNow: {
         trau: getLinhVatSlot('trau'),
@@ -1774,11 +1862,19 @@ const server = http.createServer(async (req, res) => {
         if (body.config?.buffaloRace) {
           merged.buffaloRace = { ...gameConfig.buffaloRace, ...body.config.buffaloRace };
         }
+        if (body.config?.vegFeast) {
+          merged.vegFeast = { ...gameConfig.vegFeast, ...body.config.vegFeast };
+        }
         gameConfig = normalizeConfig(merged);
         const curS = computeRaceSlot(Date.now(), gameConfig.buffaloRace, TZ_OFFSET_MS);
         raceSchedTracker.lastStartedSlot = curS.curSlot;
         raceSchedTracker.lastWarnSlot = -1;
         raceSchedTracker.lastWarnMin = 0;
+        const curVeg = computeVegFeastStatus(Date.now(), gameConfig.vegFeast, TZ_OFFSET_MS, vegManualOpenUntil, vegManualSlotId);
+        vegFeastTracker.wasOpen = curVeg.isOpen;
+        vegFeastTracker.lastSlotKey = curVeg.slotKey;
+        vegFeastTracker.lastWarnSlotKey = '';
+        vegFeastTracker.lastWarnMin = 0;
       }
       saveConfig();
 
@@ -1804,6 +1900,7 @@ const server = http.createServer(async (req, res) => {
       for (const p of allPlayers.values()) {
         p.send({ t: 'merit', me: p.getMeritData() });
         p.send(buildLinhVatPayload(p.rec));
+        p.send({ t: 'veg-feast', vegFeast: buildVegFeastPayload(p.rec) });
       }
 
       sendJson(res, 200, { ok: true, state: buildAdminState() });
@@ -1837,7 +1934,7 @@ const server = http.createServer(async (req, res) => {
       const numFields = [
         'merit', 'todayMerit', 'weekMerit', 'bows', 'rounds', 'countedBeads',
         'sitMin', 'days', 'streak', 'bestStreak', 'incenseCount', 'lanternCount',
-        'bellCount', 'moCount', 'sweepCount', 'feedCount', 'vowCount', 'quizCount'
+        'bellCount', 'moCount', 'sweepCount', 'feedCount', 'vowCount', 'quizCount', 'vegMeals'
       ];
       for (const f of numFields) {
         if (patch[f] !== undefined && Number.isFinite(Number(patch[f]))) {
@@ -2057,6 +2154,25 @@ const server = http.createServer(async (req, res) => {
         const minsLeft = Math.max(1, Math.min(3, Math.round(Number(body.minsLeft) || 3)));
         const slot = getCurrentRaceSlot(Date.now());
         broadcastRaceScheduleEvent('warn', slot, minsLeft);
+      } else if (action === 'trigger-veg-open') {
+        const nowTs = Date.now();
+        const durMin = Math.max(5, Math.min(180, Math.round(Number(body.durationMin) || gameConfig.vegFeast?.durationMin || 60)));
+        vegManualOpenUntil = nowTs + durMin * 60000;
+        vegManualSlotId += 1;
+        const vegSt = computeVegFeastStatus(nowTs, gameConfig.vegFeast, TZ_OFFSET_MS, vegManualOpenUntil, vegManualSlotId);
+        vegFeastTracker.wasOpen = vegSt.isOpen;
+        vegFeastTracker.lastSlotKey = vegSt.slotKey;
+        vegFeastTracker.lastWarnSlotKey = '';
+        vegFeastTracker.lastWarnMin = 0;
+        broadcastVegFeastEvent('start', vegSt, 0);
+      } else if (action === 'trigger-veg-close') {
+        const nowTs = Date.now();
+        vegManualOpenUntil = 0;
+        const vegSt = computeVegFeastStatus(nowTs, gameConfig.vegFeast, TZ_OFFSET_MS, vegManualOpenUntil, vegManualSlotId);
+        vegFeastTracker.wasOpen = vegSt.isOpen;
+        vegFeastTracker.lastSlotKey = vegSt.slotKey;
+        broadcastVegFeastEvent(vegSt.isOpen ? null : 'end', vegSt, 0);
+        if (vegSt.isOpen) broadcastVegFeastAll();
       } else if (action === 'clear-yt') {
         for (const r of targetRooms) {
           r.yt = { current: null, queue: [], disco: false };
@@ -3281,6 +3397,59 @@ wss.on('connection', (ws, req) => {
         break;
       }
 
+      case 'veg-sync': {
+        player.send({ t: 'veg-feast', vegFeast: buildVegFeastPayload(player.rec) });
+        break;
+      }
+
+      case 'veg-eat': {
+        const dishId = typeof msg.dish === 'string' ? msg.dish.trim() : '';
+        const dish = VEG_MENU.find((d) => d.id === dishId);
+        if (!dish) break;
+        const nowMs = Date.now();
+        rolloverCalendar(player.rec);
+        const st = computeVegFeastStatus(nowMs, gameConfig.vegFeast, TZ_OFFSET_MS, vegManualOpenUntil, vegManualSlotId);
+        if (!st.isOpen) {
+          player.send({
+            t: 'notice',
+            text: `⏳ Chưa đến giờ mở Tiệc Chay (${st.hoursText})! Hẹn bạn lúc ${st.nextLabel} để thọ trai nhận Công đức.`
+          });
+          player.send({ t: 'veg-feast', vegFeast: buildVegFeastPayload(player.rec, nowMs) });
+          break;
+        }
+
+        let meritGained = 0;
+        let feastRewarded = false;
+        const slotDishes = syncRecordVegSlot(player.rec, st);
+        if (!slotDishes.includes(dish.id) && slotDishes.length < st.maxDishesPerSlot) {
+          slotDishes.push(dish.id);
+          player.rec.vegMeals = (player.rec.vegMeals || 0) + 1;
+          player.advanceQuests('veg', 1);
+          const pts = Math.max(0, Number(gameConfig.rewards?.vegFeast) || 0);
+          meritGained = pts;
+          feastRewarded = true;
+          player.rewardAction('vegFeast', `Dự ${st.activeLabel} · ${dish.name}`);
+        } else {
+          scheduleSave();
+        }
+
+        player.room?.broadcast({
+          t: 'veg-eat',
+          id: player.id,
+          name: player.rec.name,
+          dish: dish.id,
+          dishName: dish.name,
+          feast: true,
+          feastRewarded,
+          tasteRewarded: false,
+          meritGained,
+          x: player.x,
+          z: player.z
+        });
+        player.send({ t: 'veg-feast', vegFeast: buildVegFeastPayload(player.rec, nowMs) });
+        break;
+      }
+
       default:
         break;
     }
@@ -3312,6 +3481,10 @@ setInterval(() => {
   const raceTick = evaluateRaceTick(raceSchedTracker, nowMs, gameConfig.buffaloRace, TZ_OFFSET_MS);
   if (raceTick.event) {
     broadcastRaceScheduleEvent(raceTick.event, raceTick.slot, raceTick.minsLeft);
+  }
+  const vegTick = evaluateVegFeastTick(vegFeastTracker, nowMs, gameConfig.vegFeast, TZ_OFFSET_MS, vegManualOpenUntil, vegManualSlotId);
+  if (vegTick.event) {
+    broadcastVegFeastEvent(vegTick.event, vegTick.status, vegTick.minsLeft);
   }
   for (const player of allPlayers.values()) {
     if (player.s === 2) {
